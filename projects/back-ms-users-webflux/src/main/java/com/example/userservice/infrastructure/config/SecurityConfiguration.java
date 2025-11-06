@@ -2,45 +2,37 @@ package com.example.userservice.infrastructure.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
+import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.web.server.SecurityWebFilterChain;
 
 /**
- * Security configuration for the application.
+ * Reactive security configuration for the WebFlux application.
  * <p>
  * This configuration sets up security rules allowing access to Swagger UI,
- * API documentation endpoints, and H2 console for development purposes.
+ * API documentation endpoints, and actuator endpoints for development purposes.
  * </p>
  * 
  * @author Jiliar Silgado <jiliar.silgado@gmail.com>
  * @version 1.0.0
  */
 @Configuration
-@EnableWebSecurity
+@EnableWebFluxSecurity
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .authorizeHttpRequests(authz -> authz
-                .requestMatchers("/h2-console/**").permitAll()
-                .requestMatchers("/swagger-ui/**").permitAll()
-                .requestMatchers("/v3/api-docs/**").permitAll()
-                .requestMatchers("/swagger-ui.html").permitAll()
-                .requestMatchers("/actuator/**").permitAll()
-                .requestMatchers("/users/**").permitAll()
-                .requestMatchers("/locations/**").permitAll()
-                .anyRequest().permitAll()
+    public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
+        return http
+            .authorizeExchange(exchanges -> exchanges
+                .pathMatchers("/swagger-ui/**").permitAll()
+                .pathMatchers("/v3/api-docs/**").permitAll()
+                .pathMatchers("/swagger-ui.html").permitAll()
+                .pathMatchers("/actuator/**").permitAll()
+                .pathMatchers("/users/**").permitAll()
+                .pathMatchers("/locations/**").permitAll()
+                .anyExchange().permitAll()
             )
-            .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/h2-console/**")
-                .ignoringRequestMatchers("/api/**")
-                .ignoringRequestMatchers("/users/**")
-                .ignoringRequestMatchers("/locations/**")
-            )
-            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.disable()));
-        
-        return http.build();
+            .csrf(ServerHttpSecurity.CsrfSpec::disable)
+            .build();
     }
 }

@@ -40,7 +40,12 @@ class DocsGenerator:
         if self.output_dir.exists():
             shutil.rmtree(self.output_dir)
             print(f"Cleaned docs directory: {self.output_dir}")
+        
+        # Recreate directory structure
         self.output_dir.mkdir(parents=True, exist_ok=True)
+        (self.output_dir / "puml" / "open-api").mkdir(parents=True, exist_ok=True)
+        (self.output_dir / "md").mkdir(parents=True, exist_ok=True)
+        (self.output_dir / "txt").mkdir(parents=True, exist_ok=True)
     
     def generate_all_docs(self, formats: List[str] = None, clean_first: bool = True) -> Dict[str, List[str]]:
         """

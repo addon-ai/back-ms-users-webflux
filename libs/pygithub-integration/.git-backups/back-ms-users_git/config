@@ -1,0 +1,16 @@
+[core]
+	repositoryformatversion = 0
+	filemode = true
+	bare = false
+	logallrefupdates = true
+	ignorecase = true
+	precomposeunicode = true
+[user]
+	name = Jiliar Silgado
+	email = jiliar.silgado@gmail.com
+[remote "origin"]
+	url = git@github.com:addon-ai/back-ms-users.git
+	fetch = +refs/heads/*:refs/remotes/origin/*
+[branch "feature/push_automatic_20251105_194418"]
+	remote = origin
+	merge = refs/heads/feature/push_automatic_20251105_194418

@@ -178,3 +178,9 @@ class ProjectGenerator:
         content = self.template_renderer.render_template('project/ci-cd.yml.mustache', mustache_context)
         file_path = github_dir / "ci-cd.yml"
         self.file_manager.write_file(file_path, content)
+    
+    def generate_gitignore(self, mustache_context: Dict[str, Any]):
+        """Generate .gitignore file."""
+        content = self.template_renderer.render_template('project/.gitignore.mustache', mustache_context)
+        file_path = self.output_dir / ".gitignore"
+        self.file_manager.write_file(file_path, content)

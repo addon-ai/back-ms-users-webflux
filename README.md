@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project generates complete Java Spring Boot applications following **Hexagonal Architecture (Ports and Adapters) principles** from Smithy service definitions. It automatically creates a fully functional backend with proper layer separation and dependency inversion.
+This project generates complete Java Spring Boot applications following **Hexagonal Architecture (Ports and Adapters) principles** from Smithy service definitions. It automatically creates a fully functional backend with proper layer separation, dependency inversion, and **GitHub integration**.
 
 ## Features
 
@@ -28,6 +28,14 @@ This project generates complete Java Spring Boot applications following **Hexago
 - ✅ **Template-Based Diagrams** - Uses Mustache templates for consistent diagram generation
 - ✅ **Automated Pipeline** - Integrated documentation generation in code generation pipeline
 
+### GitHub Integration
+- ✅ **Repository Management** - Automatically creates GitHub repositories for generated projects
+- ✅ **Branch Management** - Creates develop, test, staging, and main branches
+- ✅ **Git History Preservation** - Maintains git history when updating existing projects
+- ✅ **Automatic Commits** - Commits and pushes changes to feature branches
+- ✅ **Multi-Project Support** - Handles multiple projects in the projects directory
+- ✅ **Smart Synchronization** - Detects existing repositories and handles updates appropriately
+
 ## Quick Start
 
 ### 1. Install Dependencies
@@ -40,28 +48,41 @@ poetry install
 brew install maven
 sdk install java 21.0.2-tem
 sdk use java 21.0.2-tem
+
+# Install additional Python packages for GitHub integration
+pip3 install requests
 ```
 
-### 2. Generate Project
+### 2. Set up GitHub Integration (Optional)
+
+```bash
+# Set your GitHub personal access token
+export GITHUB_TOKEN="your_github_token_here"
+
+# Or add to your shell profile (.bashrc, .zshrc, etc.)
+echo 'export GITHUB_TOKEN="your_github_token_here"' >> ~/.zshrc
+```
+
+### 3. Generate Project
 
 ```bash
 # Make script executable
-chmod +x scripts/run-hexagonal-architecture-generator.sh
+chmod +x scripts/code-gen-pipeline.sh
 
-# Run generator
-./scripts/run-hexagonal-architecture-generator.sh
+# Run complete pipeline (includes GitHub integration if token is set)
+./scripts/code-gen-pipeline.sh
 ```
 
-### 3. Run Generated Project
+### 4. Run Generated Project
 
 ```bash
-cd generated-project
+cd projects/[project-name]
 
 # Build and run
 mvn spring-boot:run
 ```
 
-### 4. Test API
+### 5. Test API
 
 ```bash
 # Create user
@@ -88,7 +109,14 @@ curl http://localhost:8080/users
 - **Java 21** (recommended with SDKMAN)
 - **Maven 3.8+**
 - **Python 3.6+**
-- **Smithy CLI** (optional, can use Maven plugin)
+- **Git** (for GitHub integration)
+- **GitHub Personal Access Token** (for GitHub integration)
+
+### GitHub Setup
+1. Create a GitHub Personal Access Token:
+   - Go to GitHub Settings → Developer settings → Personal access tokens
+   - Generate new token with `repo` permissions
+   - Set as environment variable: `export GITHUB_TOKEN="your_token"`
 
 ### Java Installation with SDKMAN
 ```bash
@@ -115,23 +143,9 @@ curl -sSL https://install.python-poetry.org | python3 -
 
 # Install project dependencies
 poetry install
-```
 
-The project uses `pyproject.toml` for dependency management:
-```toml
-[tool.poetry.dependencies]
-python = "^3.8"
-pystache = "^0.6.8"
-```
-
-### Smithy CLI (Optional)
-```bash
-# Using Homebrew
-brew tap smithy-lang/tap
-brew install smithy-cli
-
-# Verify installation
-smithy --version
+# Or install manually
+pip3 install pystache requests
 ```
 
 ## Project Structure
@@ -140,547 +154,196 @@ smithy --version
 boiler-plate-code-gen/
 ├── libs/
 │   ├── pyjava-backend-codegen/         # Core code generation library
-│   │   ├── code_generator.py           # Main orchestrator
-│   │   ├── generators/                 # Component-based generators
-│   │   │   ├── dto_generator.py        # DTO generation
-│   │   │   ├── domain_generator.py     # Domain layer generation
-│   │   │   ├── application_generator.py # Application layer generation
-│   │   │   ├── infrastructure_generator.py # Infrastructure layer generation
-│   │   │   ├── test_generator.py       # Test generation
-│   │   │   └── project_generator.py    # Project structure generation
-│   │   └── templates/                  # Mustache templates for code generation
 │   ├── openapi-docs-generator/         # OpenAPI documentation generator
-│   │   ├── generators/
-│   │   │   └── puml_generator.py       # PlantUML diagram generator
-│   │   └── templates/
-│   │       ├── class_diagram.mustache  # Entity class diagrams
-│   │       └── api_diagram.mustache    # API operation diagrams
-│   └── architect-docs-generator/       # Architecture documentation generator
-│       ├── core/
-│       │   └── project_analyzer.py     # Java project analyzer
-│       ├── generators/
-│       │   ├── component_diagram_generator.py # Component diagrams
-│       │   └── sequence_diagram_generator.py  # Sequence diagrams
-│       └── templates/
-│           ├── component_diagram.mustache     # Hexagonal architecture diagrams
-│           └── sequence_diagram.mustache      # CRUD sequence diagrams
+│   ├── pyarchitect-docs-generator/     # Architecture documentation generator
+│   ├── pygithub-integration/           # GitHub integration library
+│   │   ├── core/
+│   │   │   ├── github_client.py        # GitHub API client
+│   │   │   └── git_manager.py          # Git operations manager
+│   │   └── generators/
+│   │       └── project_sync_generator.py # Project synchronization
+│   └── config/
+│       ├── params.json                 # Project configuration
+│       └── github-config.json          # GitHub integration settings
 ├── scripts/
-│   ├── code-gen-pipeline.sh            # Complete generation pipeline
-│   ├── hexagonal-architecture-generator.py # Legacy generator script
-│   └── run-hexagonal-architecture-generator.sh # Execution script
-├── smithy/
-│   ├── user-service.smithy             # User service definition
-│   ├── movie-service.smithy            # Movie service definition
-│   └── smithy-build.json               # Smithy build configuration
-├── build/
-│   └── smithy/                         # Generated OpenAPI specifications
-├── docs/
-│   └── puml/                           # Generated PlantUML diagrams
-│       ├── open-api/                   # OpenAPI-based diagrams
-│       └── components/                 # Architecture diagrams
+│   └── code-gen-pipeline.sh            # Complete generation pipeline
 ├── projects/                           # Generated Spring Boot projects
-│   ├── back-ms-users/                  # User microservice
-│   └── back-ms-movies/                 # Movie microservice
-└── generated-project/                  # Legacy output directory
+├── docs/puml/                          # Generated documentation
+└── README.md
 ```
 
-## Generator Usage
+## GitHub Integration Usage
 
-### Component-Based Generator (Recommended)
-
+### Automatic Integration (Recommended)
 ```bash
-# Using the new component-based generator
-python3 libs/pyjava-backend-codegen/code_generator.py <config_path> <templates_dir> <output_dir>
-```
-
-### Example
-
-```bash
-python3 libs/pyjava-backend-codegen/code_generator.py \
-  libs/pyjava-backend-codegen/templates/template-config.json \
-  libs/pyjava-backend-codegen/templates \
-  generated-project
-```
-
-### Legacy Generator
-
-```bash
-# Using the legacy monolithic generator
-python3 scripts/hexagonal-architecture-generator.py \
-  templates/java/template-config.json \
-  templates/java \
-  generated-project
-```
-
-### Complete Generation Pipeline (Recommended)
-
-```bash
-# Run the complete pipeline: code generation + documentation
+# Set GitHub token and run complete pipeline
+export GITHUB_TOKEN="your_token"
 ./scripts/code-gen-pipeline.sh
 ```
 
-### Individual Generators
-
+### Manual Integration
 ```bash
-# Code generation only
-./scripts/run-hexagonal-architecture-generator.sh
+# Sync all projects
+python3 libs/pygithub-integration.py
 
-# OpenAPI documentation only
-python3 libs/openapi-docs-generator/generators/puml_generator.py
-
-# Architecture documentation only
-python3 libs/architect-docs-generator/generators/component_diagram_generator.py
-python3 libs/architect-docs-generator/generators/sequence_diagram_generator.py
+# Sync specific project
+python3 libs/pygithub-integration.py project-name
 ```
+
+### GitHub Integration Features
+
+#### New Repository Creation
+- Creates GitHub repository with project name
+- Initializes with main branch
+- Creates develop, test, staging branches
+- Pushes initial project code
+
+#### Existing Repository Updates
+- Backs up existing .git history
+- Regenerates project with latest templates
+- Restores git history
+- Creates feature branch with timestamp
+- Commits and pushes changes
+
+#### Branch Naming Convention
+- Feature branches: `feature/push_automatic_YYYYMMDD_HHMMSS`
+- Default branches: `main`, `develop`, `test`, `staging`
 
 ## Generated Architecture
 
-The generator creates a complete Hexagonal Architecture project with proper package structure:
+The generator creates a complete Hexagonal Architecture project with proper package structure and GitHub integration:
 
 ```
-generated-project/
-├── src/main/java/com/example/userservice/
-│   ├── domain/
-│   │   ├── model/User.java                    # Pure domain entities
-│   │   └── ports/
-│   │       ├── input/UserUseCase.java         # Consolidated use case interface
-│   │       └── output/UserRepositoryPort.java # Repository interfaces
-│   ├── application/
-│   │   ├── dto/                               # Data transfer objects
-│   │   │   ├── CreateUserRequestContent.java
-│   │   │   ├── GetUserResponseContent.java
-│   │   │   └── ...
-│   │   ├── service/UserService.java           # Consolidated use case implementation
-│   │   ├── mapper/UserMapper.java             # Entity mappers
-│   │   └── util/LoggingUtils.java             # Logging utilities with MDC support
-│   └── infrastructure/
-│       ├── config/ApplicationConfiguration.java # Spring configuration
-│       └── adapters/
-│           ├── input/rest/UserController.java   # REST controllers
-│           └── output/persistence/
-│               ├── entity/UserDbo.java         # JPA entities
-│               ├── repository/JpaUserRepository.java # Spring Data repos
-│               └── adapter/UserRepositoryAdapter.java # Repository implementations
-├── src/test/java/com/example/userservice/
-│   ├── application/
-│   │   ├── service/UserServiceTest.java       # Comprehensive service tests
-│   │   └── util/LoggingUtilsTest.java         # Logging utility tests
-│   └── resources/
-│       └── logback-test.xml                   # Test logging configuration
-└── pom.xml
+projects/[project-name]/
+├── .git/                               # Git repository (if GitHub integration enabled)
+├── .github/workflows/                  # CI/CD workflows
+├── src/main/java/com/example/service/
+│   ├── domain/                         # Pure domain layer
+│   ├── application/                    # Application services and DTOs
+│   └── infrastructure/                 # Controllers and adapters
+├── src/test/java/                      # Comprehensive test suite
+└── pom.xml                            # Maven configuration
 ```
-
-### Architecture Layers
-
-#### Domain Layer (`domain/`) - The Core
-- **Models**: Pure POJOs without framework dependencies
-- **Input Ports**: Use case interfaces (e.g., `CreateUserUseCase`)
-- **Output Ports**: Repository interfaces (e.g., `UserRepositoryPort`)
-
-#### Application Layer (`application/`) - Orchestration
-- **Services**: Use case implementations with business logic
-- **DTOs**: Request/Response objects with validation
-- **Mappers**: MapStruct interfaces for transformations
-
-#### Infrastructure Layer (`infrastructure/`) - Adapters
-- **Input Adapters**: REST controllers for HTTP handling
-- **Output Adapters**: JPA repositories and database adapters
-- **JPA Entities**: Database entities with annotations
-- **Configuration**: Spring Boot configuration classes
-
-## Template Mapping Strategy
-
-The generator intelligently maps existing templates to Hexagonal Architecture layers:
-
-| Template | Domain Layer | Application Layer | Infrastructure Layer |
-|----------|-------------|-------------------|---------------------|
-| `pojo.mustache` | Domain Model | DTO | - |
-| `apiEntity.mustache` | - | - | JPA Entity |
-| `interface.mustache` | Use Case Port | - | - |
-| `apiService.mustache` | - | Use Case Implementation | - |
-| `apiController.mustache` | - | - | REST Controller |
-| `apiRepository.mustache` | Repository Port | - | JPA Repository + Adapter |
 
 ## Configuration
 
-### Template Configuration (`templates/java/template-config.json`)
-
-Key configuration options:
+### GitHub Configuration (`libs/config/github-config.json`)
 ```json
 {
-  "configOptions": {
-    "basePackage": "com.example.userservice",
-    "mainClass": "UserServiceApplication",
-    "useSpringBoot3": "true",
-    "useJakartaEe": "true",
-    "useBeanValidation": "true",
-    "java21": "true"
-  }
-}
-```
-
-## Smithy Service Definition
-
-### 1. Project Structure Requirements
-
-**IMPORTANT**: Each Smithy service file must have a corresponding projection in `smithy-build.json` to generate the OpenAPI specification.
-
-#### Required Configuration:
-```json
-{
-  "version": "1.0",
-  "projections": {
-    "user_service": {
-      "plugins": {
-        "openapi": {
-          "service": "com.example.userservice#UserService",
-          "protocol": "aws.protocols#restJson1"
-        }
-      }
-    },
-    "movie_service": {
-      "plugins": {
-        "openapi": {
-          "service": "com.example.movieservice#MovieService",
-          "protocol": "aws.protocols#restJson1"
-        }
-      }
+  "github": {
+    "defaultBranches": ["develop", "test", "staging", "main"],
+    "repositorySettings": {
+      "private": false,
+      "autoInit": false
     }
   }
 }
 ```
 
-### 2. Operation Naming Conventions
-
-**IMPORTANT**: The generator expects operations to follow specific CRUD prefixes for proper code generation:
-
-#### Required Operation Prefixes:
-- **`Create`** - For creating new entities (e.g., `CreateUser`, `CreateMovie`, `CreateRental`)
-- **`Get`** - For retrieving single entities (e.g., `GetUser`, `GetMovie`, `GetRental`)
-- **`Update`** - For updating existing entities (e.g., `UpdateUser`, `UpdateMovie`, `UpdateRental`)
-- **`Delete`** - For deleting entities (e.g., `DeleteUser`, `DeleteMovie`, `DeleteRental`)
-- **`List`** - For listing multiple entities (e.g., `ListUsers`, `ListMovies`, `ListRentals`)
-
-#### Examples:
-✅ **Correct Naming**:
-```smithy
-operations: [
-    CreateMovie,     // → Generates MovieService with Movie entity
-    GetMovie,        // → Generates MovieService with Movie entity
-    UpdateMovie,     // → Generates MovieService with Movie entity
-    DeleteMovie,     // → Generates MovieService with Movie entity
-    ListMovies,      // → Generates MovieService with Movie entity (singular)
-    CreateRental,    // → Generates RentalService with Rental entity
-    UpdateRental     // → Generates RentalService with Rental entity
+### Project Configuration (`libs/config/params.json`)
+```json
+[
+  {
+    "project": {
+      "general": {
+        "name": "back-ms-users",
+        "basePackage": "com.example.userservice"
+      }
+    }
+  }
 ]
 ```
 
-❌ **Incorrect Naming** (will cause generation issues):
-```smithy
-operations: [
-    RentMovie,       // ❌ No CRUD prefix - generates "Entity" fallback
-    ReturnMovie,     // ❌ No CRUD prefix - generates "Entity" fallback
-    SearchUsers,     // ❌ No CRUD prefix - generates "Entity" fallback
-    FindMovies       // ❌ No CRUD prefix - generates "Entity" fallback
-]
-```
+## Development Workflow with GitHub Integration
 
-### 3. Define Your Service in Smithy
-
-Create or modify `smithy/user-service.smithy`:
-
-```smithy
-@title("User Service API")
-@cors(origin: "*")
-@restJson1
-@documentation("A service for managing user accounts.")
-service UserService {
-    version: "2023-01-01",
-    operations: [
-        CreateUser,
-        GetUser, 
-        UpdateUser,
-        DeleteUser,
-        ListUsers
-    ]
-}
-
-@http(method: "POST", uri: "/users")
-operation CreateUser {
-    input: CreateUserRequest,
-    output: CreateUserResponse,
-    errors: [ValidationError, ConflictError]
-}
-
-// Define your structures, operations, etc.
-```
-
-## Generated Components
-
-### Example Generated Files
-
-1. **Domain Model** (`domain/model/User.java`)
-```java
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class User {
-    private String userId;
-    private String username;
-    private String email;
-    // ... other fields
-}
-```
-
-2. **Consolidated Use Case Interface** (`domain/ports/input/UserUseCase.java`)
-```java
-public interface UserUseCase {
-    CreateUserResponseContent create(CreateUserRequestContent request);
-    GetUserResponseContent get(String userId);
-    UpdateUserResponseContent update(String userId, UpdateUserRequestContent request);
-    DeleteUserResponseContent delete(String userId);
-    ListUsersResponseContent list();
-}
-```
-
-3. **Consolidated Application Service** (`application/service/UserService.java`)
-```java
-@Service
-@RequiredArgsConstructor
-@Transactional
-public class UserService implements UserUseCase {
-    private final UserRepositoryPort userRepositoryPort;
-    private final UserMapper userMapper;
-    
-    @Override
-    public CreateUserResponseContent create(CreateUserRequestContent request) {
-        // Business logic implementation
-    }
-    
-    @Override
-    public GetUserResponseContent get(String userId) {
-        // Business logic implementation
-    }
-    
-    // ... other CRUD operations
-}
-```
-
-4. **REST Controller** (`infrastructure/adapters/input/rest/UserController.java`)
-```java
-@RestController
-@RequestMapping("/users")
-@RequiredArgsConstructor
-public class UserController {
-    private final UserUseCase userUseCase;
-    
-    @PostMapping
-    public ResponseEntity<CreateUserResponseContent> createUser(
-            @Valid @RequestBody CreateUserRequestContent request,
-            @RequestHeader("X-Request-ID") String requestId) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(userUseCase.create(request));
-    }
-    
-    @GetMapping("/{userId}")
-    public ResponseEntity<GetUserResponseContent> getUser(@PathVariable String userId) {
-        return ResponseEntity.ok(userUseCase.get(userId));
-    }
-    
-    // ... other endpoints
-}
-```
-
-## Generated Artifacts
-
-### Code Artifacts
-The generated `pom.xml` includes:
-- Spring Boot 3.x (Web, Data JPA, Validation)
-- Jakarta EE APIs
-- MapStruct for mapping
-- Lombok for boilerplate reduction
-- H2/PostgreSQL for database
-- JUnit 5 for testing
-- AssertJ for fluent assertions
-- Mockito for mocking
-- Logback for logging with test configuration
-
-### Documentation Artifacts
-Generated in `docs/puml/`:
-- **OpenAPI Diagrams** (`open-api/`) - Entity class diagrams and API operation diagrams
-- **Component Diagrams** (`components/`) - Hexagonal architecture diagrams showing layer relationships
-- **Sequence Diagrams** (`components/`) - CRUD operation flows for each service
-- **PlantUML Format** - All diagrams in `.puml` format for easy rendering and version control
-
-## API Endpoints
-
-Generated REST API endpoints:
-- `POST /users` - Create user
-- `GET /users/{userId}` - Get user by ID
-- `PUT /users/{userId}` - Update user
-- `DELETE /users/{userId}` - Delete user
-- `GET /users` - List users with pagination and search
-
-## Architecture Principles
-
-The generator ensures:
-
-1. **Dependency Rule**: Dependencies point inward toward the domain (hexagon center)
-2. **Ports and Adapters**: External communication only through well-defined interfaces
-3. **Interface Segregation**: Small, focused interfaces for each use case
-4. **Single Responsibility**: Each class has one reason to change
-5. **Dependency Inversion**: High-level modules don't depend on low-level modules
-
-## Development Workflow
-
-1. **Define Service**: Create/modify Smithy service definition with proper @documentation traits
-2. **Generate Everything**: Run the complete pipeline `./scripts/code-gen-pipeline.sh`
+1. **Define Service**: Create/modify Smithy service definition
+2. **Generate Everything**: Run `./scripts/code-gen-pipeline.sh`
    - Generates Spring Boot projects
-   - Creates OpenAPI specifications
-   - Generates architecture diagrams
-   - Creates sequence diagrams
-3. **Review Documentation**: Check generated PlantUML diagrams in `docs/puml/`
-4. **Implement Business Logic**: Add specific business rules in services
-5. **Add Tests**: Create unit and integration tests
-6. **Configure Database**: Update `application.properties` for your database
-7. **Deploy**: Build and deploy the Spring Boot application
+   - Creates documentation and diagrams
+   - Synchronizes with GitHub repositories
+3. **Review Changes**: Check GitHub repositories for:
+   - New repositories (if created)
+   - Feature branches with updates (if existing)
+4. **Create Pull Requests**: Review and merge feature branches
+5. **Deploy**: Use CI/CD workflows in generated repositories
 
-## Component Architecture
+## GitHub Integration Components
 
-The generator uses a modular component-based architecture with three main libraries:
+### GitHubClient (`libs/pygithub-integration/core/github_client.py`)
+- Repository existence checking
+- Repository creation
+- User authentication
 
-### Code Generation Components (`libs/pyjava-backend-codegen/`)
+### GitManager (`libs/pygithub-integration/core/git_manager.py`)
+- Git repository initialization
+- Branch creation and management
+- Commit and push operations
+- Git history backup/restore
 
-1. **DTOGenerator** (`dto_generator.py`) - Generates data transfer objects
-2. **DomainGenerator** (`domain_generator.py`) - Creates domain models and ports
-3. **ApplicationGenerator** (`application_generator.py`) - Builds application services and mappers
-4. **InfrastructureGenerator** (`infrastructure_generator.py`) - Creates controllers and adapters
-5. **TestGenerator** (`test_generator.py`) - Generates comprehensive test suites
-6. **ProjectGenerator** (`project_generator.py`) - Sets up project structure and configuration
-
-### Documentation Generation Components
-
-#### OpenAPI Documentation (`libs/openapi-docs-generator/`)
-- **PumlGenerator** - Generates PlantUML diagrams from OpenAPI specifications
-- **Entity Classification** - Separates domain entities from DTOs
-- **API Operation Diagrams** - Creates visual representations of REST endpoints
-
-#### Architecture Documentation (`libs/architect-docs-generator/`)
-- **ProjectAnalyzer** - Analyzes Java project structure and extracts metadata
-- **ComponentDiagramGenerator** - Creates hexagonal architecture diagrams
-- **SequenceDiagramGenerator** - Generates CRUD sequence diagrams from actual controller code
-- **Real Code Analysis** - Extracts method signatures and parameters from Java files
-
-### Test Coverage Features
-
-- **100% Code Coverage** - All generated code includes comprehensive tests
-- **Edge Case Testing** - Tests for null parameters, exceptions, and error conditions
-- **Functional Testing** - LoggingUtils tests use functional approach with assertDoesNotThrow()
-- **MDC Testing** - Complete coverage of logging conditional branches
-- **Repository Testing** - Proper mocking and verification of repository interactions
-
-## Customization
-
-### Adding New Operations
-1. Add operation to Smithy service definition
-2. Run generator to create new use cases and endpoints
-3. Implement business logic in generated services
-
-### Adding New Entities
-
-Modify the `entities` list in the component generators:
-
-```python
-entities = ["User", "Product", "Order"]
-```
-
-### Modifying Templates
-1. Edit Mustache templates in `libs/pyjava-backend-codegen/templates/`
-2. Regenerate project to apply changes
-
-### Extending Test Coverage
-1. Modify test templates to add new test scenarios
-2. Update `serviceTest.mustache` for additional edge cases
-3. Enhance `LoggingUtilsTest.mustache` for new logging patterns
-
-### Extending Entities
-1. Add fields to Smithy structures
-2. Regenerate to update DTOs, entities, and mappers
-
-## Best Practices
-
-1. **Keep Domain Pure**: Domain layer should have no external dependencies (hexagon center)
-2. **Use Ports and Adapters**: All external communication goes through well-defined interfaces
-3. **Test Each Layer**: Unit test domain logic, integration test adapters
-4. **Follow Naming Conventions**: UseCase, Port, Adapter, Dbo suffixes
-5. **Maintain Dependency Direction**: Always point toward the domain (inward to hexagon center)
+### ProjectSyncGenerator (`libs/pygithub-integration/generators/project_sync_generator.py`)
+- Multi-project synchronization
+- Smart repository detection
+- Code regeneration with history preservation
 
 ## Troubleshooting
 
-### Common Issues
+### GitHub Integration Issues
 
-1. **Python Dependencies Missing**
+1. **Authentication Errors**
    ```bash
-   poetry install
+   # Verify token is set
+   echo $GITHUB_TOKEN
+   
+   # Test GitHub API access
+   curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user
    ```
 
-2. **Smithy Build Fails**
-   ```bash
-   smithy build --debug
-   ```
+2. **Repository Creation Fails**
+   - Check token permissions (needs `repo` scope)
+   - Verify repository name doesn't already exist
+   - Check GitHub API rate limits
 
-3. **Generated Code Compilation Errors**
-   - Check Java version (requires Java 21)
-   - Verify Maven dependencies
-   - Ensure proper package structure
+3. **Git Push Fails**
+   - Ensure git is configured: `git config --global user.name "Your Name"`
+   - Check repository permissions
+   - Verify remote URL is correct
 
-4. **Template Rendering Issues**
-   - Verify Mustache template syntax
-   - Check context variables in generator script
+4. **Project Regeneration Issues**
+   - Ensure code generator templates are available
+   - Check project structure matches expected format
+   - Verify backup/restore process
 
-5. **Missing Templates**: Ensure all required `.mustache` files exist
-6. **Package Conflicts**: Check that `basePackage` is correctly set
-7. **Permission Errors**: Ensure output directory is writable
+### Common Solutions
+```bash
+# Reset git configuration
+git config --global user.name "Your Name"
+git config --global user.email "your.email@example.com"
+
+# Clear git cache
+git rm -r --cached .
+git add .
+
+# Force push (use with caution)
+git push --force-with-lease origin branch-name
+```
 
 ## Extension Points
 
-The generator can be extended to:
-
-### Code Generation Extensions
-- Support different frameworks (Quarkus, Micronaut)
-- Add more adapter types (messaging, external APIs)
-- Generate integration tests
-- Add more hexagonal patterns
-
-### Documentation Extensions
-- Generate API documentation in other formats (Swagger UI, Postman collections)
-- Create deployment diagrams
-- Generate database schema diagrams
-- Add interactive diagram features
-- Support other diagram formats (Mermaid, Draw.io)
-
-### Pipeline Extensions
-- Add code quality checks
-- Integrate with CI/CD pipelines
-- Generate project templates for different IDEs
-- Add Docker containerization
+The GitHub integration can be extended to:
+- Support other Git providers (GitLab, Bitbucket)
+- Add pull request automation
+- Integrate with CI/CD platforms
+- Add deployment automation
+- Support custom branch strategies
 
 ## Contributing
 
 1. Fork the repository
 2. Create feature branch
-3. Add/modify templates or generator logic
-4. Test with sample Smithy services
+3. Add/modify GitHub integration components
+4. Test with sample projects
 5. Submit pull request
 
 ## License
 
 This project is licensed under the MIT License.
-
-## Support
-
-For issues and questions:
-1. Check the troubleshooting section
-2. Review generated code structure
-3. Verify Smithy service definition
-4. Check Python and Java versions

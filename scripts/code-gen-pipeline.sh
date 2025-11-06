@@ -37,22 +37,39 @@ if ! command -v python3 &> /dev/null; then
 fi
 echo "✅ Python 3 found"
 
-# Install pystache if not available
+# Install dependencies if not available
 echo "📦 Checking dependencies..."
+DEPS_MISSING=false
+
 if ! python3 -c "import pystache" 2>/dev/null; then
     echo "📥 Installing pystache..."
     pip3 install pystache
-    echo "✅ Pystache installed"
-else
-    echo "✅ Dependencies satisfied"
+    DEPS_MISSING=true
 fi
 
-# Remove existing projects if they exist
-echo "🗑️  Cleaning up existing projects..."
-if [ -d "$PROJECT_ROOT/projects" ]; then
-    rm -rf "$PROJECT_ROOT/projects"
+if ! python3 -c "import requests" 2>/dev/null; then
+    echo "📥 Installing requests..."
+    pip3 install requests
+    DEPS_MISSING=true
 fi
-echo "✅ Cleanup complete"
+
+if [ "$DEPS_MISSING" = false ]; then
+    echo "✅ Dependencies satisfied"
+else
+    echo "✅ Dependencies installed"
+fi
+
+# Smart cleanup: preserve Git history for existing GitHub repositories
+echo "🔍 Checking existing projects and GitHub repositories..."
+if [ -n "$GITHUB_TOKEN" ] && [ -d "$PROJECT_ROOT/projects" ]; then
+    python3 "$PROJECT_ROOT/libs/pygithub-integration.py" --backup-only
+else
+    echo "🗑️  Cleaning up existing projects..."
+    if [ -d "$PROJECT_ROOT/projects" ]; then
+        rm -rf "$PROJECT_ROOT/projects"
+    fi
+    echo "✅ Cleanup complete"
+fi
 
 echo ""
 echo "🏗️  Step 1: Generating Java Backend projects with hexagonal architecture..."
@@ -80,14 +97,27 @@ echo "📚 Step 4: Generating OpenAPI documentation..."
 echo ""
 
 # Run the OpenAPI documentation generator
-python3 "$PROJECT_ROOT/libs/openapi-docs-generator.py"
+python3 "$PROJECT_ROOT/libs/pyopenapi-docs-generator.py"
 
 echo ""
 echo "🏗️  Step 5: Generating architectural diagrams (components & sequences)..."
 echo ""
 
 # Run the architectural documentation generator
-python3 "$PROJECT_ROOT/libs/architect-docs-generator.py"
+python3 "$PROJECT_ROOT/libs/pyarchitect-docs-generator.py"
+
+echo ""
+echo "🐙 Step 6: Synchronizing projects with GitHub repositories..."
+echo ""
+
+# Run the GitHub integration
+if [ -n "$GITHUB_TOKEN" ]; then
+    python3 "$PROJECT_ROOT/libs/pygithub-integration.py" --sync
+    echo "✅ GitHub synchronization complete"
+else
+    echo "⚠️  GITHUB_TOKEN not set. Skipping GitHub synchronization."
+    echo "   Set GITHUB_TOKEN environment variable to enable GitHub integration."
+fi
 
 echo ""
 echo "🎉 Code Generation Pipeline complete!"
@@ -98,4 +128,5 @@ echo "   • schemas/*/fake-data/ → Fake data"
 echo "   • docs/puml/open-api/ → OpenAPI documentation (PlantUML, Markdown, TXT)"
 echo "   • docs/puml/components/ → Architectural component diagrams (PlantUML)"
 echo "   • docs/puml/sequences/ → CRUD sequence diagrams by service (PlantUML)"
+echo "   • GitHub repositories → Synchronized with generated projects (if GITHUB_TOKEN set)"
 echo "🚀 Ready to run: cd projects/[project-name] && mvn spring-boot:run"

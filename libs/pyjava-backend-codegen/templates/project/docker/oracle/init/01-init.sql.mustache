@@ -1,0 +1,23 @@
+-- Oracle Database Initialization Script
+-- Project: {{project.general.name}}
+-- Database: {{database.name}}
+
+-- Create tablespace
+CREATE TABLESPACE {{database.name}}_data
+DATAFILE '{{database.name}}_data.dbf' SIZE 100M
+AUTOEXTEND ON NEXT 10M MAXSIZE UNLIMITED;
+
+-- Create user
+CREATE USER {{database.user}} IDENTIFIED BY {{database.password}}
+DEFAULT TABLESPACE {{database.name}}_data
+TEMPORARY TABLESPACE temp;
+
+-- Grant privileges
+GRANT CONNECT, RESOURCE, DBA TO {{database.user}};
+GRANT CREATE SESSION TO {{database.user}};
+GRANT CREATE TABLE TO {{database.user}};
+GRANT CREATE SEQUENCE TO {{database.user}};
+GRANT CREATE VIEW TO {{database.user}};
+
+-- Set default schema
+ALTER SESSION SET CURRENT_SCHEMA = {{database.user}};

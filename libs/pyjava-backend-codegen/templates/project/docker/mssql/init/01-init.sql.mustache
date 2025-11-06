@@ -1,0 +1,33 @@
+-- SQL Server Database Initialization Script
+-- Project: {{project.general.name}}
+-- Database: {{database.name}}
+
+-- Create database if it doesn't exist
+IF NOT EXISTS (SELECT name FROM sys.databases WHERE name = '{{database.name}}')
+BEGIN
+    CREATE DATABASE [{{database.name}}]
+    COLLATE SQL_Latin1_General_CP1_CI_AS;
+END
+GO
+
+-- Use the database
+USE [{{database.name}}];
+GO
+
+-- Create login if it doesn't exist
+IF NOT EXISTS (SELECT name FROM sys.server_principals WHERE name = '{{database.user}}')
+BEGIN
+    CREATE LOGIN [{{database.user}}] WITH PASSWORD = '{{database.password}}';
+END
+GO
+
+-- Create user if it doesn't exist
+IF NOT EXISTS (SELECT name FROM sys.database_principals WHERE name = '{{database.user}}')
+BEGIN
+    CREATE USER [{{database.user}}] FOR LOGIN [{{database.user}}];
+END
+GO
+
+-- Grant privileges
+ALTER ROLE db_owner ADD MEMBER [{{database.user}}];
+GO

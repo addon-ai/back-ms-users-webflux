@@ -1,0 +1,18 @@
+-- MySQL Database Initialization Script
+-- Project: {{project.general.name}}
+-- Database: {{database.name}}
+
+-- Create database if it doesn't exist
+CREATE DATABASE IF NOT EXISTS `{{database.name}}` 
+CHARACTER SET utf8mb4 
+COLLATE utf8mb4_unicode_ci;
+
+-- Use the database
+USE `{{database.name}}`;
+
+-- Create user if it doesn't exist
+CREATE USER IF NOT EXISTS '{{database.user}}'@'%' IDENTIFIED BY '{{database.password}}';
+
+-- Grant privileges
+GRANT ALL PRIVILEGES ON `{{database.name}}`.* TO '{{database.user}}'@'%';
+FLUSH PRIVILEGES;

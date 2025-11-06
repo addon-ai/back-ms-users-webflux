@@ -202,6 +202,33 @@ class ProjectGenerator:
         file_path = docker_dir / "01-init.sql"
         self.file_manager.write_file(file_path, content)
     
+    def generate_mysql_init_script(self, mustache_context: Dict[str, Any]):
+        """Generate MySQL initialization script."""
+        docker_dir = self.output_dir / "docker" / "mysql" / "init"
+        self.file_manager.ensure_directory(docker_dir)
+        
+        content = self.template_renderer.render_template('project/docker/mysql/init/01-init.sql.mustache', mustache_context)
+        file_path = docker_dir / "01-init.sql"
+        self.file_manager.write_file(file_path, content)
+    
+    def generate_oracle_init_script(self, mustache_context: Dict[str, Any]):
+        """Generate Oracle initialization script."""
+        docker_dir = self.output_dir / "docker" / "oracle" / "init"
+        self.file_manager.ensure_directory(docker_dir)
+        
+        content = self.template_renderer.render_template('project/docker/oracle/init/01-init.sql.mustache', mustache_context)
+        file_path = docker_dir / "01-init.sql"
+        self.file_manager.write_file(file_path, content)
+    
+    def generate_mssql_init_script(self, mustache_context: Dict[str, Any]):
+        """Generate SQL Server initialization script."""
+        docker_dir = self.output_dir / "docker" / "mssql" / "init"
+        self.file_manager.ensure_directory(docker_dir)
+        
+        content = self.template_renderer.render_template('project/docker/mssql/init/01-init.sql.mustache', mustache_context)
+        file_path = docker_dir / "01-init.sql"
+        self.file_manager.write_file(file_path, content)
+    
     def generate_environment_properties(self, environment: str, mustache_context: Dict[str, Any]):
         """Generate environment-specific properties with variables."""
         context = mustache_context.copy()

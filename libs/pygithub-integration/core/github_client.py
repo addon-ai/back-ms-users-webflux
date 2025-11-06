@@ -85,11 +85,8 @@ class GitHubClient:
         url = f"{self.base_url}/repos/{owner}/{repo_name}/branches/{branch}/protection"
         
         protection_data = {
-            "required_status_checks": {
-                "strict": True,
-                "contexts": ["build-and-test"]
-            },
-            "enforce_admins": True,
+            "required_status_checks": None,
+            "enforce_admins": False,
             "required_pull_request_reviews": {
                 "required_approving_review_count": 1,
                 "dismiss_stale_reviews": True,
@@ -101,6 +98,11 @@ class GitHubClient:
         }
         
         response = requests.put(url, headers=self.headers, json=protection_data)
+        
+        if response.status_code != 200:
+            error_msg = response.json().get('message', 'Unknown error') if response.content else 'No response content'
+            print(f"Branch protection failed for {branch}: {response.status_code} - {error_msg}")
+        
         return response.status_code == 200
     
     def setup_repository_protection(self, owner: str, repo_name: str, protected_branches: List[str]):

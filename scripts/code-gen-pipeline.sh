@@ -117,7 +117,7 @@ echo ""
 
 # Run the GitHub integration
 if [ -n "$GITHUB_TOKEN" ]; then
-    python3 "$PROJECT_ROOT/libs/py-github-integration.py" --sync
+    python3 "$PROJECT_ROOT/libs/py-github-integration.py"
     echo "✅ GitHub synchronization complete"
     
     echo "🔒 Applying branch protection rules..."

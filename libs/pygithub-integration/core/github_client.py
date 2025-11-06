@@ -89,7 +89,7 @@ class GitHubClient:
                 "strict": True,
                 "contexts": ["build-and-test"]
             },
-            "enforce_admins": False,
+            "enforce_admins": True,
             "required_pull_request_reviews": {
                 "required_approving_review_count": 1,
                 "dismiss_stale_reviews": True,
@@ -97,7 +97,8 @@ class GitHubClient:
             },
             "restrictions": None,
             "allow_force_pushes": False,
-            "allow_deletions": False
+            "allow_deletions": False,
+            "block_creations": False
         }
         
         response = requests.put(url, headers=self.headers, json=protection_data)

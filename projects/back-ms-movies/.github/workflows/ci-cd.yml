@@ -23,11 +23,11 @@ jobs:
       - name: 1. Checkout repository
         uses: actions/checkout@v4
 
-      - name: 2. Set up Java (JDK {{devops.ci.javaVersion}})
+      - name: 2. Set up Java (JDK 21)
         uses: actions/setup-java@v4
         with:
-          java-version: '{{devops.ci.javaVersion}}'
-          distribution: '{{devops.ci.javaDistribution}}'
+          java-version: '21'
+          distribution: 'temurin'
 
       - name: 3. Cache Maven dependencies
         uses: actions/cache@v4
@@ -40,29 +40,29 @@ jobs:
       - name: 4. Run unit tests
         run: mvn -B test --file pom.xml
         env:
-          MAVEN_OPTS: '{{devops.ci.mavenOpts}}'
+          MAVEN_OPTS: '-Xmx1024m'
 
       - name: 5. Generate coverage report
         run: mvn -B jacoco:report --file pom.xml
         env:
-          MAVEN_OPTS: '{{devops.ci.mavenOpts}}'
+          MAVEN_OPTS: '-Xmx1024m'
 
       - name: 6. Check code coverage
         run: mvn -B verify -DskipTests -Djacoco.skip=false --file pom.xml
         env:
-          MAVEN_OPTS: '{{devops.ci.mavenOpts}}'
+          MAVEN_OPTS: '-Xmx1024m'
 
       - name: 7. Build and package
         run: mvn -B package -DskipTests --file pom.xml
         env:
-          MAVEN_OPTS: '{{devops.ci.mavenOpts}}'
+          MAVEN_OPTS: '-Xmx1024m'
 
       - name: 8. Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: '{{devops.ci.artifactName}}'
+          name: 'movie-service-jar'
           path: target/*.jar
-          retention-days: {{devops.ci.artifactRetentionDays}}
+          retention-days: 30
 
   # ----------------------------------------------------
   # JOB 2: Publish to GitHub Packages
@@ -81,11 +81,11 @@ jobs:
       - name: 1. Checkout repository
         uses: actions/checkout@v4
 
-      - name: 2. Set up Java (JDK {{devops.ci.javaVersion}})
+      - name: 2. Set up Java (JDK 21)
         uses: actions/setup-java@v4
         with:
-          java-version: '{{devops.ci.javaVersion}}'
-          distribution: '{{devops.ci.javaDistribution}}'
+          java-version: '21'
+          distribution: 'temurin'
           server-id: github
           server-username: GITHUB_ACTOR
           server-password: GITHUB_TOKEN
@@ -101,4 +101,4 @@ jobs:
       - name: 4. Build and publish to GitHub Packages
         run: mvn -B deploy -DskipTests --file pom.xml
         env:
-          MAVEN_OPTS: '{{devops.ci.mavenOpts}}'
+          MAVEN_OPTS: '-Xmx1024m'

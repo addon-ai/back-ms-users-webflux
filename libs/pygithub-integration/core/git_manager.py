@@ -82,13 +82,12 @@ class GitManager:
         subprocess.run(['git', 'branch', '-M', 'main'], check=True)
     
     def initial_commit_and_push(self, commit_message: str = "Initial commit: Generated Spring Boot project"):
-        """Create initial commit with only README.md for main branch"""
+        """Create initial commit with generated README.md using template"""
         os.chdir(self.project_path)
         
-        # Create basic README.md for initial commit
-        readme_content = f"# {self.project_name}\n\nGenerated Spring Boot project with Hexagonal Architecture\n"
-        with open('README.md', 'w') as f:
-            f.write(readme_content)
+        # Generate README.md using the template if it doesn't exist
+        if not os.path.exists('README.md'):
+            self._generate_readme_from_template()
         
         subprocess.run(['git', 'add', 'README.md'], check=True)
         subprocess.run(['git', 'commit', '-m', commit_message], check=True)

@@ -108,9 +108,21 @@ class GitHubClient:
     
     def create_pr_template(self, owner: str, repo_name: str, template_content: str):
         """Create PR template in repository"""
-        url = f"{self.base_url}/repos/{owner}/{repo_name}/contents/.github/pull_request_template.md"
+        # First create .github directory if it doesn't exist
+        github_dir_url = f"{self.base_url}/repos/{owner}/{repo_name}/contents/.github/.gitkeep"
         
         import base64
+        
+        # Create .github directory with .gitkeep file
+        gitkeep_data = {
+            "message": "Create .github directory",
+            "content": base64.b64encode(b"").decode()
+        }
+        
+        requests.put(github_dir_url, headers=self.headers, json=gitkeep_data)
+        
+        # Now create PR template
+        url = f"{self.base_url}/repos/{owner}/{repo_name}/contents/.github/pull_request_template.md"
         encoded_content = base64.b64encode(template_content.encode()).decode()
         
         data = {
@@ -119,4 +131,6 @@ class GitHubClient:
         }
         
         response = requests.put(url, headers=self.headers, json=data)
+        if response.status_code != 201:
+            print(f"PR template creation failed: {response.status_code} - {response.text}")
         return response.status_code == 201

@@ -1,137 +1,89 @@
+# Docker Compose for Local Development Only
+# This file is designed for local development with hardcoded values
+# For other environments, use Kubernetes, Docker Swarm, or cloud services
+
 version: '3.8'
 
 services:
-{{#database.postgresql}}
+  # PostgreSQL Database for Local Development
   postgres:
-    image: postgres:{{database.version}}
-    container_name: {{project.general.name}}-postgres
+    image: postgres:15.0-alpine
+    container_name: {{project.general.name}}-postgres-local
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: {{database.name}}
-      POSTGRES_USER: {{database.user}}
-      POSTGRES_PASSWORD: {{database.password}}
+      POSTGRES_DB: {{project.general.name}}_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password123
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
     ports:
-      - "{{database.port}}:5432"
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d
     networks:
       - {{project.general.name}}-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d {{project.general.name}}_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  {{project.general.name}}-service:
-    build: .
-    container_name: {{project.general.name}}-service
+  # Application Service (Local Profile)
+  {{project.general.name}}-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: {{project.general.name}}-app-local
+    restart: unless-stopped
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/{{database.name}}
-      SPRING_DATASOURCE_USERNAME: {{database.user}}
-      SPRING_DATASOURCE_PASSWORD: {{database.password}}
+      # Force local profile for Docker Compose
+      SPRING_PROFILES_ACTIVE: local
+      # Override database host for container networking
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/{{project.general.name}}_db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: password123
+      # JVM settings for development
+      JAVA_OPTS: "-Xmx512m -Xms256m -XX:+UseG1GC"
     ports:
-      - "{{infra.http.ports.ext}}:{{infra.http.ports.int}}"
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - {{project.general.name}}-network
+    volumes:
+      # Mount logs for debugging
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # pgAdmin for Database Management (Optional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: {{project.general.name}}-pgadmin-local
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@{{project.general.name}}.local
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - "5050:80"
     depends_on:
       - postgres
     networks:
       - {{project.general.name}}-network
-{{/database.postgresql}}{{#database.mysql}}
-  mysql:
-    image: mysql:{{database.version}}
-    container_name: {{project.general.name}}-mysql
-    environment:
-      MYSQL_DATABASE: {{database.name}}
-      MYSQL_USER: {{database.user}}
-      MYSQL_PASSWORD: {{database.password}}
-      MYSQL_ROOT_PASSWORD: {{database.password}}
-    ports:
-      - "{{database.port}}:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - {{project.general.name}}-network
+    profiles:
+      - tools
 
-  {{project.general.name}}-service:
-    build: .
-    container_name: {{project.general.name}}-service
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/{{database.name}}
-      SPRING_DATASOURCE_USERNAME: {{database.user}}
-      SPRING_DATASOURCE_PASSWORD: {{database.password}}
-    ports:
-      - "{{infra.http.ports.ext}}:{{infra.http.ports.int}}"
-    depends_on:
-      - mysql
-    networks:
-      - {{project.general.name}}-network
-{{/database.mysql}}{{#database.oracle}}
-  oracle:
-    image: container-registry.oracle.com/database/express:{{database.version}}
-    container_name: {{project.general.name}}-oracle
-    environment:
-      ORACLE_PWD: {{database.password}}
-      ORACLE_CHARACTERSET: AL32UTF8
-    ports:
-      - "{{database.port}}:1521"
-      - "5500:5500"
-    volumes:
-      - oracle_data:/opt/oracle/oradata
-    networks:
-      - {{project.general.name}}-network
-
-  {{project.general.name}}-service:
-    build: .
-    container_name: {{project.general.name}}-service
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@oracle:1521:XE
-      SPRING_DATASOURCE_USERNAME: {{database.user}}
-      SPRING_DATASOURCE_PASSWORD: {{database.password}}
-    ports:
-      - "{{infra.http.ports.ext}}:{{infra.http.ports.int}}"
-    depends_on:
-      - oracle
-    networks:
-      - {{project.general.name}}-network
-{{/database.oracle}}{{#database.sqlserver}}
-  sqlserver:
-    image: mcr.microsoft.com/mssql/server:{{database.version}}
-    container_name: {{project.general.name}}-sqlserver
-    environment:
-      SA_PASSWORD: {{database.password}}
-      ACCEPT_EULA: Y
-      MSSQL_DB: {{database.name}}
-    ports:
-      - "{{database.port}}:1433"
-    volumes:
-      - sqlserver_data:/var/opt/mssql
-    networks:
-      - {{project.general.name}}-network
-
-  {{project.general.name}}-service:
-    build: .
-    container_name: {{project.general.name}}-service
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:sqlserver://sqlserver:1433;databaseName={{database.name}}
-      SPRING_DATASOURCE_USERNAME: {{database.user}}
-      SPRING_DATASOURCE_PASSWORD: {{database.password}}
-    ports:
-      - "{{infra.http.ports.ext}}:{{infra.http.ports.int}}"
-    depends_on:
-      - sqlserver
-    networks:
-      - {{project.general.name}}-network
-{{/database.sqlserver}}{{#database.h2}}
-  {{project.general.name}}-service:
-    build: .
-    container_name: {{project.general.name}}-service
-    ports:
-      - "{{infra.http.ports.ext}}:{{infra.http.ports.int}}"
-    networks:
-      - {{project.general.name}}-network
-{{/database.h2}}
-
-{{^database.h2}}
 volumes:
-{{#database.postgresql}}  postgres_data:{{/database.postgresql}}
-{{#database.mysql}}  mysql_data:{{/database.mysql}}
-{{#database.oracle}}  oracle_data:{{/database.oracle}}
-{{#database.sqlserver}}  sqlserver_data:{{/database.sqlserver}}
-{{/database.h2}}
+  postgres_data:
+    driver: local
 
 networks:
   {{project.general.name}}-network:
     driver: bridge
+    name: {{project.general.name}}-local-network

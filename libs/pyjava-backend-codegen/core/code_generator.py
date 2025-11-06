@@ -219,6 +219,8 @@ class CodeGenerator:
         self.project_generator.generate_maven_wrapper(self.mustache_context)
         self.project_generator.generate_ci_cd_workflow(self.mustache_context)
         self.project_generator.generate_gitignore(self.mustache_context)
+        self.project_generator.generate_dockerignore(self.mustache_context)
+        self.project_generator.generate_postgres_init_script(self.mustache_context)
     
     def _group_operations_by_entity(self, all_operations: List[Dict[str, Any]], all_entities: set) -> Dict[str, List[Dict[str, Any]]]:
         """Group operations by entity for consolidated services."""
@@ -296,3 +298,4 @@ class CodeGenerator:
         print("- Domain: Pure business logic and ports")
         print("- Application: Use case implementations and DTOs")
         print("- Infrastructure: External adapters (REST, JPA, Config)")
+    

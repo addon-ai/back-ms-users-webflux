@@ -122,7 +122,7 @@ class ProjectGenerator:
         self.file_manager.write_file(file_path, content)
     
     def generate_application_properties(self, mustache_context: Dict[str, Any]):
-        """Generate application.properties file."""
+        """Generate unified application.properties file."""
         content = self.template_renderer.render_template('application.properties.mustache', mustache_context)
         file_path = self.output_dir / "src/main/resources/application.properties"
         self.file_manager.write_file(file_path, content)
@@ -183,4 +183,21 @@ class ProjectGenerator:
         """Generate .gitignore file."""
         content = self.template_renderer.render_template('project/.gitignore.mustache', mustache_context)
         file_path = self.output_dir / ".gitignore"
+        self.file_manager.write_file(file_path, content)
+    
+
+    
+    def generate_dockerignore(self, mustache_context: Dict[str, Any]):
+        """Generate .dockerignore file."""
+        content = self.template_renderer.render_template('project/.dockerignore.mustache', mustache_context)
+        file_path = self.output_dir / ".dockerignore"
+        self.file_manager.write_file(file_path, content)
+    
+    def generate_postgres_init_script(self, mustache_context: Dict[str, Any]):
+        """Generate PostgreSQL initialization script."""
+        docker_dir = self.output_dir / "docker" / "postgres" / "init"
+        self.file_manager.ensure_directory(docker_dir)
+        
+        content = self.template_renderer.render_template('project/docker/postgres/init/01-init.sql.mustache', mustache_context)
+        file_path = docker_dir / "01-init.sql"
         self.file_manager.write_file(file_path, content)

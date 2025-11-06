@@ -111,20 +111,104 @@ git push origin v1.0.0
 
 ## ▶️ Running the Application
 
-### 🔧 Development Mode
+### 🏠 Local Development (Default)
 ```bash
+# Uses application-local.properties with hardcoded values
 mvn spring-boot:run
+# or
+java -jar target/{{artifactId}}-{{artifactVersion}}.jar
 ```
 
-### 🏭 Production Build
+### 🌍 Environment-Specific Profiles
+
+#### Available Profiles
+{{#devops.github.defaultBranches}}- **{{.}}**: {{#isLocal}}Local development with hardcoded values{{/isLocal}}{{^isLocal}}{{.}} environment with environment variables{{/isLocal}}
+{{/devops.github.defaultBranches}}
+
+#### Running with Specific Profile
 ```bash
+# Development environment
+mvn spring-boot:run -Dspring-boot.run.profiles=develop
+
+# Test environment  
+mvn spring-boot:run -Dspring-boot.run.profiles=test
+
+# Staging environment
+mvn spring-boot:run -Dspring-boot.run.profiles=staging
+
+# Production environment
+mvn spring-boot:run -Dspring-boot.run.profiles=prod
+```
+
+#### Using JAR with Profile
+```bash
+# Build JAR
 mvn clean package
-java -jar target/{{artifactId}}-{{artifactVersion}}.jar
+
+# Run with specific profile
+java -jar target/{{artifactId}}-{{artifactVersion}}.jar --spring.profiles.active=develop
+java -jar target/{{artifactId}}-{{artifactVersion}}.jar --spring.profiles.active=test
+java -jar target/{{artifactId}}-{{artifactVersion}}.jar --spring.profiles.active=staging
+java -jar target/{{artifactId}}-{{artifactVersion}}.jar --spring.profiles.active=prod
+```
+
+#### Environment Variables (Non-Local Profiles)
+For profiles other than `local`, set these environment variables:
+```bash
+# Database Configuration
+export DB_URL="jdbc:postgresql://localhost:5432/{{project.general.name}}_db"
+export DB_USERNAME="your_db_user"
+export DB_PASSWORD="your_db_password"
+
+# Optional Configuration (with defaults)
+export SERVER_PORT="8080"
+export JPA_DDL_AUTO="validate"
+export JPA_SHOW_SQL="false"
+export LOG_LEVEL="INFO"
+export SWAGGER_ENABLED="false"
+```
+
+### 🐳 Docker Development
+
+#### Local Development with Docker Compose
+```bash
+# Start PostgreSQL + Application (local profile)
+docker-compose up -d
+
+# View logs
+docker-compose logs -f {{project.general.name}}-app
+
+# Stop services
+docker-compose down
+
+# Start with pgAdmin for database management
+docker-compose --profile tools up -d
+```
+
+#### Docker Services
+- **Application**: http://localhost:8080 (uses `local` profile)
+- **PostgreSQL**: localhost:5432 (postgres/password123)
+- **pgAdmin**: http://localhost:5050 (admin@{{project.general.name}}.local/admin123)
+
+#### Production Docker Build
+```bash
+# Build optimized image
+docker build -t {{project.general.name}}:latest .
+
+# Run with environment variables
+docker run -d \
+  --name {{project.general.name}} \
+  -p 8080:8080 \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  -e DB_URL="jdbc:postgresql://your-db:5432/{{project.general.name}}_db" \
+  -e DB_USERNAME="your_user" \
+  -e DB_PASSWORD="your_password" \
+  {{project.general.name}}:latest
 ```
 
 ### 🧪 Running Tests
 ```bash
-# Unit tests
+# Unit tests (uses application-test.properties)
 mvn test
 
 # With coverage report
@@ -132,20 +216,51 @@ mvn test jacoco:report
 
 # Coverage check ({{devops.ci.coverageThreshold}}% threshold)
 mvn verify
+
+# Run tests with specific profile
+mvn test -Dspring.profiles.active=test
 ```
 
 ## ⚙️ Configuration
 
-### 🔧 Development (application.properties)
-- **Port:** {{infra.http.ports.ext}}
-- **Database:** H2 in-memory
-- **Security:** Disabled CSRF, permissive access
-- **H2 Console:** Enabled
+### 🏠 Local Profile (`application-local.properties`)
+- **Port:** 8080
+- **Database:** PostgreSQL (localhost:5432/{{project.general.name}}_db)
+- **Credentials:** postgres/password123 (hardcoded)
+- **JPA:** DDL auto-update, SQL logging enabled
+- **Swagger:** Enabled for development
+- **Logging:** DEBUG level
 
-### 🏭 Production
-- **Database:** {{#database.postgresql}}PostgreSQL{{/database.postgresql}}{{#database.mysql}}MySQL{{/database.mysql}}{{#database.oracle}}Oracle{{/database.oracle}}{{#database.sqlserver}}SQL Server{{/database.sqlserver}}
-- **Security:** Full security enabled
-- **Profiles:** Use `spring.profiles.active=prod`
+### 🌍 Environment Profiles (Variables Required)
+{{#devops.github.defaultBranches}}{{^isLocal}}
+#### {{.}} Profile (`application-{{.}}.properties`)
+- **Database:** Uses `${DB_URL}`, `${DB_USERNAME}`, `${DB_PASSWORD}`
+- **JPA:** DDL validate mode, SQL logging disabled
+- **Swagger:** Disabled by default
+- **Logging:** INFO level
+- **Security:** Production-ready settings
+{{/isLocal}}{{/devops.github.defaultBranches}}
+
+### 📋 Profile Selection Priority
+1. Command line: `--spring.profiles.active=profile`
+2. Environment variable: `SPRING_PROFILES_ACTIVE=profile`
+3. Default: `local` (from application.properties)
+
+### 🐳 Docker Configuration
+
+#### Dockerfile Features
+- **Multi-stage build**: Optimized for production
+- **Non-root user**: Security best practices
+- **Health checks**: Container health monitoring
+- **JVM optimization**: Container-aware settings
+- **Layer caching**: Efficient builds
+
+#### Docker Compose (Local Only)
+- **PostgreSQL 15**: Local database with persistent storage
+- **pgAdmin**: Database management interface (optional)
+- **Health checks**: Service dependency management
+- **Local profile**: Uses hardcoded development values
+- **Volume mounts**: Logs and database persistence
 
 ## ✅ Code Quality
 

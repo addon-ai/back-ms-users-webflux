@@ -56,12 +56,21 @@ class GitManager:
     
     def init_repository(self, repo_name: str):
         """Initialize git repository with config and SSH remote"""
+        # Ensure we're in the correct project directory
         os.chdir(self.project_path)
+        
+        # Remove any existing .git directory to ensure clean initialization
+        git_path = os.path.join(self.project_path, '.git')
+        if os.path.exists(git_path):
+            shutil.rmtree(git_path)
+            print(f"Removed existing .git directory from {self.project_name}")
         
         # Set default branch to main globally to avoid master warning
         subprocess.run(['git', 'config', '--global', 'init.defaultBranch', 'main'], check=False)
         
+        # Initialize new git repository
         subprocess.run(['git', 'init'], check=True)
+        print(f"Initialized new git repository for {self.project_name}")
         
         # Configure git user from config file
         git_config = self.config.get('github', {}).get('gitConfig', {})
@@ -77,9 +86,35 @@ class GitManager:
         
         # Add remote origin with SSH URL
         subprocess.run(['git', 'remote', 'add', 'origin', ssh_remote_url], check=True)
+        print(f"Set remote origin to: {ssh_remote_url}")
         
         # Set default branch to main
         subprocess.run(['git', 'branch', '-M', 'main'], check=True)
+    
+    def fix_remote_url(self, repo_name: str):
+        """Fix remote URL if it's pointing to wrong repository"""
+        os.chdir(self.project_path)
+        
+        # Get current remote URL
+        try:
+            result = subprocess.run(['git', 'remote', 'get-url', 'origin'], capture_output=True, text=True, check=True)
+            current_url = result.stdout.strip()
+            
+            # Create expected SSH remote URL
+            ssh_base = self.config.get('github', {}).get('sshUrl', 'git@github.com:addon-ai')
+            expected_url = f"{ssh_base}/{repo_name}.git"
+            
+            if current_url != expected_url:
+                print(f"Fixing remote URL from {current_url} to {expected_url}")
+                subprocess.run(['git', 'remote', 'set-url', 'origin', expected_url], check=True)
+                return True
+            return False
+        except subprocess.CalledProcessError:
+            print(f"No remote origin found, adding correct remote")
+            ssh_base = self.config.get('github', {}).get('sshUrl', 'git@github.com:addon-ai')
+            ssh_remote_url = f"{ssh_base}/{repo_name}.git"
+            subprocess.run(['git', 'remote', 'add', 'origin', ssh_remote_url], check=True)
+            return True
     
     def initial_commit_and_push(self, commit_message: str = "Initial commit: Generated Spring Boot project"):
         """Create initial commit with generated README.md using template"""
@@ -128,6 +163,9 @@ class GitManager:
         """Create feature branch with all project code"""
         os.chdir(self.project_path)
         
+        # Fix remote URL if needed
+        self.fix_remote_url(self.project_name)
+        
         # Commit any pending changes before checkout
         subprocess.run(['git', 'add', '.', '--force'], check=False)
         result = subprocess.run(['git', 'diff', '--cached', '--quiet'], capture_output=True)
@@ -151,6 +189,15 @@ class GitManager:
         # Commit and push
         commit_message = f"Auto-generated update: {feature_branch}"
         subprocess.run(['git', 'commit', '-m', commit_message], check=True)
-        subprocess.run(['git', 'push', '-u', 'origin', feature_branch], check=True)
+        
+        # Push with verbose output to see any errors
+        try:
+            subprocess.run(['git', 'push', '-u', 'origin', feature_branch], check=True)
+            print(f"✅ Successfully pushed {feature_branch} to origin")
+        except subprocess.CalledProcessError as e:
+            print(f"❌ Failed to push {feature_branch}: {e}")
+            # Show remote info for debugging
+            subprocess.run(['git', 'remote', '-v'], check=False)
+            raise
         
         return feature_branch

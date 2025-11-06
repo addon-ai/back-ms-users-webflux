@@ -117,12 +117,7 @@ class ProjectSyncGenerator:
             print(f"Failed to create repository {project_name}")
             return
         
-        # Remove any existing .git directory to ensure clean initialization
-        git_path = os.path.join(project_path, '.git')
-        if os.path.exists(git_path):
-            shutil.rmtree(git_path)
-        
-        # Initialize git repository
+        # Initialize git repository (this will clean any existing .git)
         git_manager.init_repository(project_name)
         
         # Include PR template locally in project BEFORE initial commit

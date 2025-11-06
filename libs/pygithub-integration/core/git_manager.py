@@ -11,8 +11,8 @@ class GitManager:
         self.project_name = os.path.basename(project_path)
         self.config = self._load_github_config()
         
-        # Prevent execution in boiler-plate-code-gen repository
-        if 'boiler-plate-code-gen' in self.project_path:
+        # Prevent execution in boiler-plate-code-gen root directory only
+        if os.path.basename(self.project_path) == 'boiler-plate-code-gen' and os.path.exists(os.path.join(self.project_path, 'scripts')):
             raise ValueError(f"GitManager should not be used in boiler-plate-code-gen repository: {self.project_path}")
     
     def _load_github_config(self) -> Dict:

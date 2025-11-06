@@ -70,3 +70,53 @@ class GitHubClient:
             return {}
         
         return response.json()
+    
+    def setup_branch_protection(self, owner: str, repo_name: str, branch: str):
+        """Setup branch protection rules"""
+        url = f"{self.base_url}/repos/{owner}/{repo_name}/branches/{branch}/protection"
+        
+        protection_data = {
+            "required_status_checks": {
+                "strict": True,
+                "contexts": ["build-and-test"]
+            },
+            "enforce_admins": True,
+            "required_pull_request_reviews": {
+                "required_approving_review_count": 1,
+                "dismiss_stale_reviews": True,
+                "require_code_owner_reviews": False
+            },
+            "restrictions": None,
+            "allow_force_pushes": False,
+            "allow_deletions": False
+        }
+        
+        response = requests.put(url, headers=self.headers, json=protection_data)
+        return response.status_code == 200
+    
+    def setup_repository_protection(self, owner: str, repo_name: str, protected_branches: List[str]):
+        """Setup protection for multiple branches"""
+        results = {}
+        for branch in protected_branches:
+            success = self.setup_branch_protection(owner, repo_name, branch)
+            results[branch] = success
+            if success:
+                print(f"✅ Protected branch: {branch}")
+            else:
+                print(f"❌ Failed to protect branch: {branch}")
+        return results
+    
+    def create_pr_template(self, owner: str, repo_name: str, template_content: str):
+        """Create PR template in repository"""
+        url = f"{self.base_url}/repos/{owner}/{repo_name}/contents/.github/pull_request_template.md"
+        
+        import base64
+        encoded_content = base64.b64encode(template_content.encode()).decode()
+        
+        data = {
+            "message": "Add PR template",
+            "content": encoded_content
+        }
+        
+        response = requests.put(url, headers=self.headers, json=data)
+        return response.status_code == 201

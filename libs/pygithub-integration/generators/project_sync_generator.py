@@ -133,6 +133,13 @@ class ProjectSyncGenerator:
         # Create feature branch with all project code
         feature_branch = git_manager.commit_project_code()
         
+        # Setup branch protection for default branches
+        owner = self.github_client.config.get('github', {}).get('organization', 'addon-ai')
+        self.github_client.setup_repository_protection(owner, project_name, default_branches)
+        
+        # Create PR template
+        self._setup_pr_template(owner, project_name)
+        
         print(f"Successfully created {project_name} with feature branch: {feature_branch}")
     
     def _update_existing_repository(self, project_name: str, project_path: str, git_manager: GitManager):
@@ -161,6 +168,15 @@ class ProjectSyncGenerator:
             
             # Create feature branch with all project code
             feature_branch = git_manager.commit_project_code()
+            
+            # Setup branch protection for default branches if not already configured
+            project_config = self._get_project_config(project_name)
+            default_branches = project_config.get('devops', {}).get('github', {}).get('defaultBranches', ['develop', 'test', 'staging', 'main'])
+            owner = self.github_client.config.get('github', {}).get('organization', 'addon-ai')
+            self.github_client.setup_repository_protection(owner, project_name, default_branches)
+            
+            # Create PR template
+            self._setup_pr_template(owner, project_name)
             
             print(f"Successfully updated {project_name} in branch {feature_branch}")
             
@@ -211,6 +227,21 @@ class ProjectSyncGenerator:
                 return params[0] if params else {}
         except FileNotFoundError:
             return {}
+    
+    def _setup_pr_template(self, owner: str, repo_name: str):
+        """Setup PR template for repository"""
+        template_path = os.path.join(self.project_root, 'libs', 'pyjava-backend-codegen', 'templates', 'project', 'pull_request_template.md')
+        try:
+            with open(template_path, 'r') as f:
+                template_content = f.read()
+            
+            success = self.github_client.create_pr_template(owner, repo_name, template_content)
+            if success:
+                print(f"✅ Created PR template for {repo_name}")
+            else:
+                print(f"❌ Failed to create PR template for {repo_name}")
+        except FileNotFoundError:
+            print(f"⚠️ PR template file not found: {template_path}")
 
 def main():
     """Main entry point"""

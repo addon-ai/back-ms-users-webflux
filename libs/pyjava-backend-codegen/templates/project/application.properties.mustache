@@ -1,9 +1,0 @@
-# Application Configuration
-spring.application.name={{project.general.name}}
-spring.profiles.active=local
-
-# Default profile includes local development settings
-# Use specific profiles for different environments:
-# - local: Local development with hardcoded values
-{{#devops.github.defaultBranches}}# - {{.}}: {{.}} environment with environment variables
-{{/devops.github.defaultBranches}}

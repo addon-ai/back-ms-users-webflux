@@ -123,7 +123,7 @@ class ProjectGenerator:
     
     def generate_application_properties(self, mustache_context: Dict[str, Any]):
         """Generate unified application.properties file."""
-        content = self.template_renderer.render_template('application.properties.mustache', mustache_context)
+        content = self.template_renderer.render_template('project/src/main/resources/application.properties.mustache', mustache_context)
         file_path = self.output_dir / "src/main/resources/application.properties"
         self.file_manager.write_file(file_path, content)
         

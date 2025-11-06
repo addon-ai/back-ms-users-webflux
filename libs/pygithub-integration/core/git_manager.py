@@ -171,6 +171,15 @@ class GitManager:
         """Create feature branch with all project code"""
         os.chdir(self.project_path)
         
+        # Clean up any submodule references
+        try:
+            subprocess.run(['git', 'rm', '--cached', '.'], capture_output=True, check=False)
+            gitmodules_path = os.path.join(self.project_path, '.gitmodules')
+            if os.path.exists(gitmodules_path):
+                os.remove(gitmodules_path)
+        except Exception:
+            pass
+        
         # Fix remote URL if needed
         self.fix_remote_url(self.project_name)
         

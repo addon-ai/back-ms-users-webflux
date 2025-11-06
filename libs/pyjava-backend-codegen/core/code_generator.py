@@ -94,6 +94,9 @@ class CodeGenerator:
         # Generate supporting files
         self._generate_supporting_files()
         
+        # Generate environment-specific properties
+        self._generate_environment_properties()
+        
         # Generate test utilities
         self.test_generator.generate_logging_utils_test(self.mustache_context)
         self.test_generator.generate_logback_test_config(self.mustache_context)
@@ -298,4 +301,16 @@ class CodeGenerator:
         print("- Domain: Pure business logic and ports")
         print("- Application: Use case implementations and DTOs")
         print("- Infrastructure: External adapters (REST, JPA, Config)")
+    
+    def _generate_environment_properties(self):
+        """Generate environment-specific properties files."""
+        # Generate properties for each environment branch (with variables)
+        default_branches = self.project_config.get('devops', {}).get('github', {}).get('defaultBranches', [])
+        for branch in default_branches:
+            if branch != 'main':  # Skip main as it's production
+                self.project_generator.generate_environment_properties(branch, self.mustache_context)
+        
+        # Generate production properties (main branch)
+        if 'main' in default_branches:
+            self.project_generator.generate_environment_properties('prod', self.mustache_context)
     

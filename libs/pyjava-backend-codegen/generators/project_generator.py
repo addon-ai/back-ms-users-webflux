@@ -201,3 +201,12 @@ class ProjectGenerator:
         content = self.template_renderer.render_template('project/docker/postgres/init/01-init.sql.mustache', mustache_context)
         file_path = docker_dir / "01-init.sql"
         self.file_manager.write_file(file_path, content)
+    
+    def generate_environment_properties(self, environment: str, mustache_context: Dict[str, Any]):
+        """Generate environment-specific properties with variables."""
+        context = mustache_context.copy()
+        context['environment'] = environment
+        
+        content = self.template_renderer.render_template('project/src/main/resources/application-environment.properties.mustache', context)
+        file_path = self.output_dir / f"src/main/resources/application-{environment}.properties"
+        self.file_manager.write_file(file_path, content)

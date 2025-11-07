@@ -31,7 +31,7 @@ echo ""
 
 # Create pipeline branch
 echo "🌿 Creating pipeline branch..."
-python3 "$PROJECT_ROOT/scripts/libs/branch_manager.py"
+python3 "$PROJECT_ROOT/libs/utils/branch_manager.py"
 echo ""
 
 # Check if Python 3 is available
@@ -81,7 +81,7 @@ echo "🏗️  Step 1: Generating Java Backend projects with hexagonal architect
 echo ""
 
 # Process each project based on its type
-python3 "$PROJECT_ROOT/scripts/libs/process_projects.py" "$CONFIG_PATH" "$PROJECT_ROOT" "$TEMPLATES_DIR"
+python3 "$PROJECT_ROOT/libs/utils/process_projects.py" "$CONFIG_PATH" "$PROJECT_ROOT" "$TEMPLATES_DIR"
 
 echo ""
 echo "📋 Step 2: Generating JSON Schemas from OpenAPI specifications..."
@@ -123,7 +123,7 @@ echo "📋 Step 6.1: Copying Flyway migration scripts to projects..."
 echo ""
 
 # Copy Flyway migrations to project directories
-python3 "$PROJECT_ROOT/scripts/libs/flyway_migration_copier.py"
+python3 "$PROJECT_ROOT/libs/utils/flyway_migration_copier.py"
 
 echo ""
 echo "🐙 Step 7: Synchronizing projects with GitHub repositories..."
@@ -165,7 +165,7 @@ echo "💾 Committing pipeline changes..."
 echo ""
 
 # Commit all pipeline changes
-python3 "$PROJECT_ROOT/scripts/libs/branch_manager.py" --commit
+python3 "$PROJECT_ROOT/libs/utils/branch_manager.py" --commit
 
 echo ""
 echo "🎉 Code Generation Pipeline complete!"

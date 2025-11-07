@@ -127,6 +127,15 @@ class ProjectGenerator:
         file_path = self.output_dir / "src/main/resources/application.yml"
         self.file_manager.write_file(file_path, content)
         
+        # Create Flyway migration directory
+        migration_dir = self.output_dir / "src/main/resources/db/migration"
+        self.file_manager.ensure_directory(migration_dir)
+        
+        # Create .gitkeep file to preserve directory structure
+        gitkeep_content = "# Flyway migration files will be generated here\n# This directory is required for Flyway to work properly"
+        gitkeep_path = migration_dir / ".gitkeep"
+        self.file_manager.write_file(gitkeep_path, gitkeep_content)
+        
         # Generate test application.properties
         test_content = self.template_renderer.render_template('application-test.properties.mustache', mustache_context)
         test_file_path = self.output_dir / "src/test/resources/application-test.properties"

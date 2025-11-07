@@ -123,9 +123,15 @@ class ProjectGenerator:
     
     def generate_application_properties(self, mustache_context: Dict[str, Any]):
         """Generate unified application.properties file."""
+        # Generate main application.yml (minimal)
         content = self.template_renderer.render_template('project/src/main/resources/application.yml.mustache', mustache_context)
         file_path = self.output_dir / "src/main/resources/application.yml"
         self.file_manager.write_file(file_path, content)
+        
+        # Generate application-local.yml (detailed configuration)
+        local_content = self.template_renderer.render_template('project/src/main/resources/application-local.yml.mustache', mustache_context)
+        local_file_path = self.output_dir / "src/main/resources/application-local.yml"
+        self.file_manager.write_file(local_file_path, local_content)
         
         # Create Flyway migration directory
         migration_dir = self.output_dir / "src/main/resources/db/migration"

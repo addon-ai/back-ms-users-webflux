@@ -31,7 +31,7 @@ public interface JpaUserRepository extends JpaRepository<UserDbo, String> {
      * 
      * 
      */
-    @Query("SELECT e FROM UserDbo e WHERE " +
+    @Query("SELECT e FROM users e WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.username) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.email) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.firstName) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.lastName) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<UserDbo> findBySearchTerm(@Param("search") String search, Pageable pageable);
@@ -39,7 +39,7 @@ public interface JpaUserRepository extends JpaRepository<UserDbo, String> {
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT e FROM UserDbo e")
+    @Query("SELECT e FROM users e")
     Page<UserDbo> findAllPaged(Pageable pageable);
 }
 

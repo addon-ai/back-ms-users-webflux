@@ -37,7 +37,7 @@ public class MovieDbo {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "MovieId", updatable = false, nullable = false)
+    @Column(name = "movie_id", updatable = false, nullable = false)
     private String id;
 
     @Column(name = "title", nullable = false)
@@ -46,15 +46,15 @@ public class MovieDbo {
     private String director;
     @Column(name = "genre", nullable = false)
     private String genre;
-    @Column(name = "releaseYear", nullable = false)
+    @Column(name = "release_year", nullable = false)
     private BigDecimal releaseYear;
     @Column(name = "duration", nullable = false)
     private BigDecimal duration;
     @Column(name = "description")
     private String description;
-    @Column(name = "availableCopies", nullable = false)
+    @Column(name = "available_copies", nullable = false)
     private BigDecimal availableCopies;
-    @Column(name = "rentalPrice", nullable = false)
+    @Column(name = "rental_price", nullable = false)
     private Double rentalPrice;
 
     @Enumerated(EnumType.STRING)

@@ -30,7 +30,7 @@ public interface JpaRegionRepository extends R2dbcRepository<RegionDbo, String> 
      * 
      * 
      */
-    @Query("SELECT * FROM  WHERE " +
+    @Query("SELECT * FROM regions WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%'))) " +
            "LIMIT :limit OFFSET :offset")
@@ -41,7 +41,7 @@ public interface JpaRegionRepository extends R2dbcRepository<RegionDbo, String> 
     /**
      * Count entities matching search term.
      */
-    @Query("SELECT COUNT(*) FROM  WHERE " +
+    @Query("SELECT COUNT(*) FROM regions WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Mono<Long> countBySearchTerm(@Param("search") String search);
@@ -49,7 +49,7 @@ public interface JpaRegionRepository extends R2dbcRepository<RegionDbo, String> 
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT * FROM  LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM regions LIMIT :limit OFFSET :offset")
     Flux<RegionDbo> findAllPaged(@Param("limit") Long limit, @Param("offset") Long offset);
 }
 

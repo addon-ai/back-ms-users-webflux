@@ -31,7 +31,7 @@ public interface JpaRentalRepository extends JpaRepository<RentalDbo, String> {
      * 
      * 
      */
-    @Query("SELECT e FROM RentalDbo e WHERE " +
+    @Query("SELECT e FROM rentals e WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<RentalDbo> findBySearchTerm(@Param("search") String search, Pageable pageable);
@@ -39,7 +39,7 @@ public interface JpaRentalRepository extends JpaRepository<RentalDbo, String> {
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT e FROM RentalDbo e")
+    @Query("SELECT e FROM rentals e")
     Page<RentalDbo> findAllPaged(Pageable pageable);
 }
 

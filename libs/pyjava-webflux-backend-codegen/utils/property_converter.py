@@ -1,11 +1,28 @@
 """
 OpenAPI property converter for Java types and validation.
 """
+import re
 from typing import Dict, List, Any
 
 
 class PropertyConverter:
     """Converts OpenAPI properties to Java properties with validation."""
+    
+    @staticmethod
+    def camel_to_snake(name: str) -> str:
+        """
+        Convert camelCase to snake_case.
+        
+        Args:
+            name: camelCase string
+            
+        Returns:
+            snake_case string
+        """
+        # Insert underscore before uppercase letters that follow lowercase letters
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        # Insert underscore before uppercase letters that follow lowercase letters or digits
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
     
     @staticmethod
     def convert_openapi_property(prop_name: str, prop_data: Dict[str, Any], required_fields: List[str]) -> Dict[str, Any]:
@@ -76,6 +93,7 @@ class PropertyConverter:
         
         return {
             'name': prop_name,
+            'nameSnake': PropertyConverter.camel_to_snake(prop_name),
             'dataType': java_type,
             'datatypeWithEnum': java_type,
             'baseName': prop_name,

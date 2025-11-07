@@ -31,7 +31,7 @@ public interface JpaCityRepository extends JpaRepository<CityDbo, String> {
      * 
      * 
      */
-    @Query("SELECT e FROM CityDbo e WHERE " +
+    @Query("SELECT e FROM cities e WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<CityDbo> findBySearchTerm(@Param("search") String search, Pageable pageable);
@@ -39,7 +39,7 @@ public interface JpaCityRepository extends JpaRepository<CityDbo, String> {
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT e FROM CityDbo e")
+    @Query("SELECT e FROM cities e")
     Page<CityDbo> findAllPaged(Pageable pageable);
 }
 

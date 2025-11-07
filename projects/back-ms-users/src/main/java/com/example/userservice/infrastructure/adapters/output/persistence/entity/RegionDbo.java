@@ -36,14 +36,14 @@ public class RegionDbo {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "RegionId", updatable = false, nullable = false)
+    @Column(name = "region_id", updatable = false, nullable = false)
     private String id;
 
     @Column(name = "name", nullable = false)
     private String name;
     @Column(name = "code", nullable = false)
     private String code;
-    @Column(name = "countryId", nullable = false)
+    @Column(name = "country_id", nullable = false)
     private String countryId;
 
     @Enumerated(EnumType.STRING)

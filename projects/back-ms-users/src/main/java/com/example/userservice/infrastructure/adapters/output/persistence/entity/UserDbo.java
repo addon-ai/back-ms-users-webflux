@@ -36,16 +36,16 @@ public class UserDbo {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "UserId", updatable = false, nullable = false)
+    @Column(name = "user_id", updatable = false, nullable = false)
     private String id;
 
     @Column(name = "username", nullable = false)
     private String username;
     @Column(name = "email", nullable = false)
     private String email;
-    @Column(name = "firstName")
+    @Column(name = "first_name")
     private String firstName;
-    @Column(name = "lastName")
+    @Column(name = "last_name")
     private String lastName;
 
     @Enumerated(EnumType.STRING)

@@ -30,7 +30,7 @@ public interface JpaRentalRepository extends R2dbcRepository<RentalDbo, String> 
      * 
      * 
      */
-    @Query("SELECT * FROM  WHERE " +
+    @Query("SELECT * FROM rentals WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%'))) " +
            "LIMIT :limit OFFSET :offset")
@@ -41,7 +41,7 @@ public interface JpaRentalRepository extends R2dbcRepository<RentalDbo, String> 
     /**
      * Count entities matching search term.
      */
-    @Query("SELECT COUNT(*) FROM  WHERE " +
+    @Query("SELECT COUNT(*) FROM rentals WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Mono<Long> countBySearchTerm(@Param("search") String search);
@@ -49,7 +49,7 @@ public interface JpaRentalRepository extends R2dbcRepository<RentalDbo, String> 
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT * FROM  LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM rentals LIMIT :limit OFFSET :offset")
     Flux<RentalDbo> findAllPaged(@Param("limit") Long limit, @Param("offset") Long offset);
 }
 

@@ -28,10 +28,10 @@ import com.example.userservice.domain.model.EntityStatus;
 public class LocationDbo {
 
     @Id
-    @Column("LocationId")
+    @Column("location_id")
     private String id;
 
-    @Column("userId")
+    @Column("user_id")
     private String userId;
     @Column("country")
     private String country;
@@ -43,13 +43,13 @@ public class LocationDbo {
     private String neighborhood;
     @Column("address")
     private String address;
-    @Column("postalCode")
+    @Column("postal_code")
     private String postalCode;
     @Column("latitude")
     private Double latitude;
     @Column("longitude")
     private Double longitude;
-    @Column("locationType")
+    @Column("location_type")
     private String locationType;
 
     @Column("status")

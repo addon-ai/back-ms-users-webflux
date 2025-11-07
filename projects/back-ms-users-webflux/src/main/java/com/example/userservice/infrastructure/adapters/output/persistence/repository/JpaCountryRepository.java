@@ -30,7 +30,7 @@ public interface JpaCountryRepository extends R2dbcRepository<CountryDbo, String
      * 
      * 
      */
-    @Query("SELECT * FROM  WHERE " +
+    @Query("SELECT * FROM countries WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%'))) " +
            "LIMIT :limit OFFSET :offset")
@@ -41,7 +41,7 @@ public interface JpaCountryRepository extends R2dbcRepository<CountryDbo, String
     /**
      * Count entities matching search term.
      */
-    @Query("SELECT COUNT(*) FROM  WHERE " +
+    @Query("SELECT COUNT(*) FROM countries WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Mono<Long> countBySearchTerm(@Param("search") String search);
@@ -49,7 +49,7 @@ public interface JpaCountryRepository extends R2dbcRepository<CountryDbo, String
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT * FROM  LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM countries LIMIT :limit OFFSET :offset")
     Flux<CountryDbo> findAllPaged(@Param("limit") Long limit, @Param("offset") Long offset);
 }
 

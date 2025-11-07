@@ -30,7 +30,7 @@ public interface JpaLocationRepository extends R2dbcRepository<LocationDbo, Stri
      * 
      * 
      */
-    @Query("SELECT * FROM  WHERE " +
+    @Query("SELECT * FROM locations WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%'))) " +
            "LIMIT :limit OFFSET :offset")
@@ -41,7 +41,7 @@ public interface JpaLocationRepository extends R2dbcRepository<LocationDbo, Stri
     /**
      * Count entities matching search term.
      */
-    @Query("SELECT COUNT(*) FROM  WHERE " +
+    @Query("SELECT COUNT(*) FROM locations WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Mono<Long> countBySearchTerm(@Param("search") String search);
@@ -49,7 +49,7 @@ public interface JpaLocationRepository extends R2dbcRepository<LocationDbo, Stri
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT * FROM  LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM locations LIMIT :limit OFFSET :offset")
     Flux<LocationDbo> findAllPaged(@Param("limit") Long limit, @Param("offset") Long offset);
 }
 

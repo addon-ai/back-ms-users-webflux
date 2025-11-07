@@ -31,7 +31,7 @@ public interface JpaMovieRepository extends JpaRepository<MovieDbo, String> {
      * 
      * 
      */
-    @Query("SELECT e FROM MovieDbo e WHERE " +
+    @Query("SELECT e FROM movies e WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.title) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.description) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<MovieDbo> findBySearchTerm(@Param("search") String search, Pageable pageable);
@@ -39,7 +39,7 @@ public interface JpaMovieRepository extends JpaRepository<MovieDbo, String> {
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT e FROM MovieDbo e")
+    @Query("SELECT e FROM movies e")
     Page<MovieDbo> findAllPaged(Pageable pageable);
 }
 

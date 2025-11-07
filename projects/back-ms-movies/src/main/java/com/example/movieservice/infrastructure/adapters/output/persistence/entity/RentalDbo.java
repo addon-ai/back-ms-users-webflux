@@ -36,22 +36,22 @@ public class RentalDbo {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "RentalId", updatable = false, nullable = false)
+    @Column(name = "rental_id", updatable = false, nullable = false)
     private String id;
 
-    @Column(name = "movieId", nullable = false)
+    @Column(name = "movie_id", nullable = false)
     private String movieId;
-    @Column(name = "userId", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private String userId;
-    @Column(name = "rentalDate", nullable = false)
+    @Column(name = "rental_date", nullable = false)
     private String rentalDate;
-    @Column(name = "dueDate", nullable = false)
+    @Column(name = "due_date", nullable = false)
     private String dueDate;
-    @Column(name = "returnDate")
+    @Column(name = "return_date")
     private String returnDate;
-    @Column(name = "totalPrice", nullable = false)
+    @Column(name = "total_price", nullable = false)
     private Double totalPrice;
-    @Column(name = "lateFee")
+    @Column(name = "late_fee")
     private Double lateFee;
 
     @Enumerated(EnumType.STRING)

@@ -30,7 +30,7 @@ public interface JpaMovieRepository extends R2dbcRepository<MovieDbo, String> {
      * 
      * 
      */
-    @Query("SELECT * FROM  WHERE " +
+    @Query("SELECT * FROM movies WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.title) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.description) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%'))) " +
            "LIMIT :limit OFFSET :offset")
@@ -41,7 +41,7 @@ public interface JpaMovieRepository extends R2dbcRepository<MovieDbo, String> {
     /**
      * Count entities matching search term.
      */
-    @Query("SELECT COUNT(*) FROM  WHERE " +
+    @Query("SELECT COUNT(*) FROM movies WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.title) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.description) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Mono<Long> countBySearchTerm(@Param("search") String search);
@@ -49,7 +49,7 @@ public interface JpaMovieRepository extends R2dbcRepository<MovieDbo, String> {
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT * FROM  LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM movies LIMIT :limit OFFSET :offset")
     Flux<MovieDbo> findAllPaged(@Param("limit") Long limit, @Param("offset") Long offset);
 }
 

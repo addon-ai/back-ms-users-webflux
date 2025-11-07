@@ -1,6 +1,7 @@
 """
 SQL DDL generator from OpenAPI schemas.
 """
+import re
 from typing import Dict, List, Any
 from core.type_mapper import get_sql_type
 
@@ -13,6 +14,21 @@ class SqlGenerator:
         
         if dialect not in self.supported_dialects:
             raise ValueError(f"Unsupported dialect: {dialect}. Supported: {self.supported_dialects}")
+    
+    def camel_to_snake(self, name: str) -> str:
+        """
+        Convert camelCase to snake_case.
+        
+        Args:
+            name: camelCase string
+            
+        Returns:
+            snake_case string
+        """
+        # Insert underscore before uppercase letters that follow lowercase letters
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        # Insert underscore before uppercase letters that follow lowercase letters or digits
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
     
     def generate_create_table(self, table_name: str, schema_def: Dict[str, Any]) -> str:
         """Generate CREATE TABLE statement from schema definition."""
@@ -43,18 +59,21 @@ class SqlGenerator:
             field_description = self._clean_sql_comment(prop_def.get('description', ''))
             comment = f' -- {field_description}' if field_description else ''
             
+            # Convert field name to snake_case
+            column_name = self.camel_to_snake(prop_name)
+            
             # Handle ID fields
             if prop_name.endswith('Id') or prop_name == 'id':
                 if prop_name == primary_key_field:
                     # This is the primary key
                     uuid_pk_type = get_sql_type({'type': 'uuid_pk'}, self.dialect)
-                    columns.append(f'{prop_name} {uuid_pk_type} -- Primary key identifier{comment}')
+                    columns.append(f'{column_name} {uuid_pk_type} -- Primary key identifier{comment}')
                 else:
                     # This is a foreign key
                     sql_type = 'UUID'
                     if prop_name in required_fields:
                         sql_type += ' NOT NULL'
-                    columns.append(f'{prop_name} {sql_type}{comment}')
+                    columns.append(f'{column_name} {sql_type}{comment}')
                 continue
             
             # Handle timestamp fields
@@ -71,7 +90,7 @@ class SqlGenerator:
             if prop_name in ['username', 'email', 'identification']:
                 sql_type += ' UNIQUE'
             
-            columns.append(f'{prop_name} {sql_type}{comment}')
+            columns.append(f'{column_name} {sql_type}{comment}')
         
         # Add audit fields if not present
         if 'created_at' not in properties and 'createdAt' not in properties:
@@ -121,9 +140,10 @@ class SqlGenerator:
                 search_fields.append(prop_name)
         
         for field in search_fields:
-            index_name = f"idx_{table_name}_{field}"
+            field_snake = self.camel_to_snake(field)
+            index_name = f"idx_{table_name}_{field_snake}"
             field_description = self._clean_sql_comment(properties.get(field, {}).get('description', f'Index for {field} field'))
-            indexes.append(f'CREATE INDEX IF NOT EXISTS {index_name} ON {table_name} ({field}); -- {field_description}')
+            indexes.append(f'CREATE INDEX IF NOT EXISTS {index_name} ON {table_name} ({field_snake}); -- {field_description}')
         
         return indexes
     

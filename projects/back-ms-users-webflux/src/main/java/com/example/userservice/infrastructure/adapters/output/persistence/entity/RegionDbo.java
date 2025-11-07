@@ -28,14 +28,14 @@ import com.example.userservice.domain.model.EntityStatus;
 public class RegionDbo {
 
     @Id
-    @Column("RegionId")
+    @Column("region_id")
     private String id;
 
     @Column("name")
     private String name;
     @Column("code")
     private String code;
-    @Column("countryId")
+    @Column("country_id")
     private String countryId;
 
     @Column("status")

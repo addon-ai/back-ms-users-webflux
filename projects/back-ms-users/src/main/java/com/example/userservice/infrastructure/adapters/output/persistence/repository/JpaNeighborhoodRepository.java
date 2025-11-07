@@ -31,7 +31,7 @@ public interface JpaNeighborhoodRepository extends JpaRepository<NeighborhoodDbo
      * 
      * 
      */
-    @Query("SELECT e FROM NeighborhoodDbo e WHERE " +
+    @Query("SELECT e FROM neighborhoods e WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<NeighborhoodDbo> findBySearchTerm(@Param("search") String search, Pageable pageable);
@@ -39,7 +39,7 @@ public interface JpaNeighborhoodRepository extends JpaRepository<NeighborhoodDbo
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT e FROM NeighborhoodDbo e")
+    @Query("SELECT e FROM neighborhoods e")
     Page<NeighborhoodDbo> findAllPaged(Pageable pageable);
 }
 

@@ -34,7 +34,7 @@ public interface {{classname}} extends JpaRepository<{{entityName}}Dbo, String> 
      * Searches by ID when no text fields are available.
      * {{/hasSearchFields}}
      */
-    @Query("SELECT e FROM {{entityName}}Dbo e WHERE " +
+    @Query("SELECT e FROM {{tableName}} e WHERE " +
            "(:search IS NULL OR " +
            "{{searchQuery}})")
     Page<{{entityName}}Dbo> findBySearchTerm(@Param("search") String search, Pageable pageable);
@@ -42,7 +42,7 @@ public interface {{classname}} extends JpaRepository<{{entityName}}Dbo, String> 
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT e FROM {{entityName}}Dbo e")
+    @Query("SELECT e FROM {{tableName}} e")
     Page<{{entityName}}Dbo> findAllPaged(Pageable pageable);
 }
 {{/isJpaRepository}}

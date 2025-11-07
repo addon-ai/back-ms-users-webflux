@@ -31,7 +31,7 @@ public interface JpaRegionRepository extends JpaRepository<RegionDbo, String> {
      * 
      * 
      */
-    @Query("SELECT e FROM RegionDbo e WHERE " +
+    @Query("SELECT e FROM regions e WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.name) LIKE LOWER(CONCAT('%', :search, '%')) OR LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<RegionDbo> findBySearchTerm(@Param("search") String search, Pageable pageable);
@@ -39,7 +39,7 @@ public interface JpaRegionRepository extends JpaRepository<RegionDbo, String> {
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT e FROM RegionDbo e")
+    @Query("SELECT e FROM regions e")
     Page<RegionDbo> findAllPaged(Pageable pageable);
 }
 

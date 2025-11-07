@@ -28,22 +28,22 @@ import com.example.movieservice.domain.model.EntityStatus;
 public class RentalDbo {
 
     @Id
-    @Column("RentalId")
+    @Column("rental_id")
     private String id;
 
-    @Column("movieId")
+    @Column("movie_id")
     private String movieId;
-    @Column("userId")
+    @Column("user_id")
     private String userId;
-    @Column("rentalDate")
+    @Column("rental_date")
     private String rentalDate;
-    @Column("dueDate")
+    @Column("due_date")
     private String dueDate;
-    @Column("returnDate")
+    @Column("return_date")
     private String returnDate;
-    @Column("totalPrice")
+    @Column("total_price")
     private Double totalPrice;
-    @Column("lateFee")
+    @Column("late_fee")
     private Double lateFee;
 
     @Column("status")

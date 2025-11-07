@@ -66,6 +66,7 @@ class InfrastructureGenerator:
             'packageName': self.target_packages['infra_entity'],
             'classname': f"{entity}Dbo",
             'entityName': entity,
+            'entityNameSnake': self._camel_to_snake(entity),
             'entityVarName': entity.lower(),
             'tableName': table_name,
             'isEntity': True,
@@ -104,6 +105,7 @@ class InfrastructureGenerator:
             'packageName': self.target_packages['infra_repository'],
             'classname': f"Jpa{entity}Repository",
             'entityName': entity,
+            'tableName': self._pluralize_entity_name(entity.lower()),
             'searchFields': search_fields,
             'searchQuery': search_query,
             'hasSearchFields': len(search_fields) > 0,
@@ -273,6 +275,22 @@ class InfrastructureGenerator:
         content = self.template_renderer.render_template('InternalServerErrorException.mustache', context)
         file_path = self.output_dir / self.file_manager.get_package_path(self.target_packages['infra_config_exceptions']) / 'InternalServerErrorException.java'
         self.file_manager.write_file(file_path, content)
+    
+    def _camel_to_snake(self, name: str) -> str:
+        """
+        Convert camelCase to snake_case.
+        
+        Args:
+            name: camelCase string
+            
+        Returns:
+            snake_case string
+        """
+        import re
+        # Insert underscore before uppercase letters that follow lowercase letters
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        # Insert underscore before uppercase letters that follow lowercase letters or digits
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
     
     def _pluralize_entity_name(self, entity_name: str) -> str:
         """Pluralize entity name with proper English rules."""

@@ -31,19 +31,19 @@ import {{import}};
 public class {{classname}} {
 
     @Id
-    @Column("{{entityName}}Id")
+    @Column("{{entityNameSnake}}_id")
     private String id;
 
 {{#vars}}
     {{^isIdField}}
     {{^isTimestampField}}
     {{#isStatusField}}
-    @Column("{{name}}")
+    @Column("{{nameSnake}}")
     @Builder.Default
     private EntityStatus {{name}} = EntityStatus.ACTIVE;
     {{/isStatusField}}
     {{^isStatusField}}
-    @Column("{{name}}")
+    @Column("{{nameSnake}}")
     private {{dataType}} {{name}};
     {{/isStatusField}}
     {{/isTimestampField}}

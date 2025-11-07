@@ -36,10 +36,10 @@ public class LocationDbo {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "LocationId", updatable = false, nullable = false)
+    @Column(name = "location_id", updatable = false, nullable = false)
     private String id;
 
-    @Column(name = "userId", nullable = false)
+    @Column(name = "user_id", nullable = false)
     private String userId;
     @Column(name = "country", nullable = false)
     private String country;
@@ -51,13 +51,13 @@ public class LocationDbo {
     private String neighborhood;
     @Column(name = "address", nullable = false)
     private String address;
-    @Column(name = "postalCode")
+    @Column(name = "postal_code")
     private String postalCode;
     @Column(name = "latitude")
     private Double latitude;
     @Column(name = "longitude")
     private Double longitude;
-    @Column(name = "locationType", nullable = false)
+    @Column(name = "location_type", nullable = false)
     private String locationType;
 
     @Enumerated(EnumType.STRING)

@@ -28,16 +28,16 @@ import com.example.userservice.domain.model.EntityStatus;
 public class UserDbo {
 
     @Id
-    @Column("UserId")
+    @Column("user_id")
     private String id;
 
     @Column("username")
     private String username;
     @Column("email")
     private String email;
-    @Column("firstName")
+    @Column("first_name")
     private String firstName;
-    @Column("lastName")
+    @Column("last_name")
     private String lastName;
 
     @Column("status")

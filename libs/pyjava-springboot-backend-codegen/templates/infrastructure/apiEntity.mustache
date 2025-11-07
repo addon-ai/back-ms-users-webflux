@@ -39,7 +39,7 @@ public class {{classname}} {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "{{entityName}}Id", updatable = false, nullable = false)
+    @Column(name = "{{entityNameSnake}}_id", updatable = false, nullable = false)
     private String id;
 
 {{#vars}}
@@ -47,12 +47,12 @@ public class {{classname}} {
     {{^isTimestampField}}
     {{#isStatusField}}
     @Enumerated(EnumType.STRING)
-    @Column(name = "{{name}}", nullable = false)
+    @Column(name = "{{nameSnake}}", nullable = false)
     @Builder.Default
     private EntityStatus {{name}} = EntityStatus.ACTIVE;
     {{/isStatusField}}
     {{^isStatusField}}
-    @Column(name = "{{name}}"{{#required}}, nullable = false{{/required}})
+    @Column(name = "{{nameSnake}}"{{#required}}, nullable = false{{/required}})
     private {{dataType}} {{name}};
     {{/isStatusField}}
     {{/isTimestampField}}

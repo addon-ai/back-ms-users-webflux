@@ -6,23 +6,23 @@
 
 -- Table for users
 CREATE TABLE IF NOT EXISTS users (
-    userId UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier -- Unique identifier for the user account. Generated automatically upon creation
+    user_id UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier -- Unique identifier for the user account. Generated automatically upon creation
     username VARCHAR(255) NOT NULL UNIQUE, -- Users unique username. Cannot be changed after account creation
     email VARCHAR(255) NOT NULL UNIQUE, -- Users email address. Used for notifications and account recovery
-    firstName VARCHAR(255), -- Users first name. May be null if not provided during registration
-    lastName VARCHAR(255), -- Users last name. May be null if not provided during registration
+    first_name VARCHAR(255), -- Users first name. May be null if not provided during registration
+    last_name VARCHAR(255), -- Users last name. May be null if not provided during registration
     status VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMPTZ NOT NULL, -- Timestamp when the user account was created. ISO 8601 format
-    updatedAt TIMESTAMPTZ NOT NULL -- Timestamp when the user account was last updated. ISO 8601 format
+    created_at TIMESTAMPTZ NOT NULL, -- Timestamp when the user account was created. ISO 8601 format
+    updated_at TIMESTAMPTZ NOT NULL -- Timestamp when the user account was last updated. ISO 8601 format
 );
 
 CREATE INDEX IF NOT EXISTS idx_users_username ON users (username); -- Users unique username. Cannot be changed after account creation
 
 CREATE INDEX IF NOT EXISTS idx_users_email ON users (email); -- Users email address. Used for notifications and account recovery
 
-CREATE INDEX IF NOT EXISTS idx_users_firstName ON users (firstName); -- Users first name. May be null if not provided during registration
+CREATE INDEX IF NOT EXISTS idx_users_first_name ON users (first_name); -- Users first name. May be null if not provided during registration
 
-CREATE INDEX IF NOT EXISTS idx_users_lastName ON users (lastName); -- Users last name. May be null if not provided during registration
+CREATE INDEX IF NOT EXISTS idx_users_last_name ON users (last_name); -- Users last name. May be null if not provided during registration
 
 CREATE INDEX IF NOT EXISTS idx_users_status ON users (status); -- Index for status field
 
@@ -50,12 +50,12 @@ INSERT INTO userstatuss (code, name, description) VALUES ('SUSPENDED', 'Suspende
 
 -- Table for cities
 CREATE TABLE IF NOT EXISTS cities (
-    cityId UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier
+    city_id UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier
     name VARCHAR(255) NOT NULL,
-    regionId UUID NOT NULL,
+    region_id UUID NOT NULL,
     status VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMPTZ NOT NULL,
-    updatedAt TIMESTAMPTZ NOT NULL
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_cities_name ON cities (name); -- Index for name field
@@ -64,12 +64,12 @@ CREATE INDEX IF NOT EXISTS idx_cities_status ON cities (status); -- Index for st
 
 -- Table for countries
 CREATE TABLE IF NOT EXISTS countries (
-    countryId UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier
+    country_id UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier
     name VARCHAR(255) NOT NULL,
     code VARCHAR(255) NOT NULL,
     status VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMPTZ NOT NULL,
-    updatedAt TIMESTAMPTZ NOT NULL
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_countries_name ON countries (name); -- Index for name field
@@ -78,17 +78,17 @@ CREATE INDEX IF NOT EXISTS idx_countries_status ON countries (status); -- Index 
 
 -- Table for locations
 CREATE TABLE IF NOT EXISTS locations (
-    locationId UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier
-    userId UUID NOT NULL,
+    location_id UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier
+    user_id UUID NOT NULL,
     country VARCHAR(255) NOT NULL,
     region VARCHAR(255) NOT NULL,
     city VARCHAR(255) NOT NULL,
     neighborhood VARCHAR(255),
     address VARCHAR(255) NOT NULL,
-    postalCode VARCHAR(255),
+    postal_code VARCHAR(255),
     latitude DOUBLE PRECISION,
     longitude DOUBLE PRECISION,
-    locationType VARCHAR(255) NOT NULL,
+    location_type VARCHAR(255) NOT NULL,
     status VARCHAR(255) NOT NULL,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Record creation timestamp
     updated_at TIMESTAMPTZ -- Record last update timestamp
@@ -116,12 +116,12 @@ INSERT INTO locationtypes (code, name, description) VALUES ('OTHER', 'Other', 'L
 
 -- Table for neighborhoods
 CREATE TABLE IF NOT EXISTS neighborhoods (
-    neighborhoodId UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier
+    neighborhood_id UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier
     name VARCHAR(255) NOT NULL,
-    cityId UUID NOT NULL,
+    city_id UUID NOT NULL,
     status VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMPTZ NOT NULL,
-    updatedAt TIMESTAMPTZ NOT NULL
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_neighborhoods_name ON neighborhoods (name); -- Index for name field
@@ -130,13 +130,13 @@ CREATE INDEX IF NOT EXISTS idx_neighborhoods_status ON neighborhoods (status); -
 
 -- Table for regions
 CREATE TABLE IF NOT EXISTS regions (
-    regionId UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier
+    region_id UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier
     name VARCHAR(255) NOT NULL,
     code VARCHAR(255) NOT NULL,
-    countryId UUID NOT NULL,
+    country_id UUID NOT NULL,
     status VARCHAR(255) NOT NULL,
-    createdAt TIMESTAMPTZ NOT NULL,
-    updatedAt TIMESTAMPTZ NOT NULL
+    created_at TIMESTAMPTZ NOT NULL,
+    updated_at TIMESTAMPTZ NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS idx_regions_name ON regions (name); -- Index for name field

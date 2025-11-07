@@ -31,7 +31,7 @@ public interface JpaLocationRepository extends JpaRepository<LocationDbo, String
      * 
      * 
      */
-    @Query("SELECT e FROM LocationDbo e WHERE " +
+    @Query("SELECT e FROM locations e WHERE " +
            "(:search IS NULL OR " +
            "LOWER(e.status) LIKE LOWER(CONCAT('%', :search, '%')))")
     Page<LocationDbo> findBySearchTerm(@Param("search") String search, Pageable pageable);
@@ -39,7 +39,7 @@ public interface JpaLocationRepository extends JpaRepository<LocationDbo, String
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT e FROM LocationDbo e")
+    @Query("SELECT e FROM locations e")
     Page<LocationDbo> findAllPaged(Pageable pageable);
 }
 

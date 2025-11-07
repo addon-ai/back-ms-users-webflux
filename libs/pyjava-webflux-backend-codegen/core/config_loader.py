@@ -2,12 +2,29 @@
 Configuration loader for project settings and parameters.
 """
 import json
+import re
 from pathlib import Path
 from typing import Dict, List, Any
 
 
 class ConfigLoader:
     """Handles loading and processing of project configuration files."""
+    
+    @staticmethod
+    def camel_to_snake(name: str) -> str:
+        """
+        Convert camelCase to snake_case.
+        
+        Args:
+            name: camelCase string
+            
+        Returns:
+            snake_case string
+        """
+        # Insert underscore before uppercase letters that follow lowercase letters
+        s1 = re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)
+        # Insert underscore before uppercase letters that follow lowercase letters or digits
+        return re.sub('([a-z0-9])([A-Z])', r'\1_\2', s1).lower()
     
     @staticmethod
     def load_projects_config(config_path: str) -> List[Dict[str, Any]]:

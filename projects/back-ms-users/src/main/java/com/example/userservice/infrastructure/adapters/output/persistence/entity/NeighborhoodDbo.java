@@ -36,12 +36,12 @@ public class NeighborhoodDbo {
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
-    @Column(name = "NeighborhoodId", updatable = false, nullable = false)
+    @Column(name = "neighborhood_id", updatable = false, nullable = false)
     private String id;
 
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "cityId", nullable = false)
+    @Column(name = "city_id", nullable = false)
     private String cityId;
 
     @Enumerated(EnumType.STRING)

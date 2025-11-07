@@ -10,8 +10,7 @@ BEGIN
     IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'users') THEN
         EXECUTE '
             CREATE TABLE public."users" (
-              "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Unique identifier,
-  "user_id" UUID NOT NULL -- Unique identifier for the user account. Generated automatically upon creation,
+              "userId" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Primary key identifier -- Unique identifier for the user account. Generated automatically upon creation,
   "username" VARCHAR(255) NOT NULL UNIQUE -- Users unique username. Cannot be changed after account creation,
   "email" VARCHAR(255) NOT NULL UNIQUE -- Users email address. Used for notifications and account recovery,
   "firstName" VARCHAR(255) -- Users first name. May be null if not provided during registration,
@@ -69,10 +68,9 @@ BEGIN
     IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'cities') THEN
         EXECUTE '
             CREATE TABLE public."cities" (
-              "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Unique identifier,
-  "city_id" UUID NOT NULL,
+              "cityId" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Primary key identifier,
   "name" VARCHAR(255) NOT NULL,
-  "region_id" UUID NOT NULL,
+  "regionId" UUID NOT NULL,
   "status" VARCHAR(255) NOT NULL,
   "createdAt" TIMESTAMPTZ NOT NULL,
   "updatedAt" TIMESTAMPTZ NOT NULL
@@ -91,8 +89,7 @@ BEGIN
     IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'countries') THEN
         EXECUTE '
             CREATE TABLE public."countries" (
-              "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Unique identifier,
-  "country_id" UUID NOT NULL,
+              "countryId" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Primary key identifier,
   "name" VARCHAR(255) NOT NULL,
   "code" VARCHAR(255) NOT NULL,
   "status" VARCHAR(255) NOT NULL,
@@ -113,9 +110,8 @@ BEGIN
     IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'locations') THEN
         EXECUTE '
             CREATE TABLE public."locations" (
-              "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Unique identifier,
-  "location_id" UUID NOT NULL,
-  "user_id" UUID NOT NULL,
+              "locationId" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Primary key identifier,
+  "userId" UUID NOT NULL,
   "country" VARCHAR(255) NOT NULL,
   "region" VARCHAR(255) NOT NULL,
   "city" VARCHAR(255) NOT NULL,
@@ -166,10 +162,9 @@ BEGIN
     IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'neighborhoods') THEN
         EXECUTE '
             CREATE TABLE public."neighborhoods" (
-              "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Unique identifier,
-  "neighborhood_id" UUID NOT NULL,
+              "neighborhoodId" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Primary key identifier,
   "name" VARCHAR(255) NOT NULL,
-  "city_id" UUID NOT NULL,
+  "cityId" UUID NOT NULL,
   "status" VARCHAR(255) NOT NULL,
   "createdAt" TIMESTAMPTZ NOT NULL,
   "updatedAt" TIMESTAMPTZ NOT NULL
@@ -188,11 +183,10 @@ BEGIN
     IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'regions') THEN
         EXECUTE '
             CREATE TABLE public."regions" (
-              "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Unique identifier,
-  "region_id" UUID NOT NULL,
+              "regionId" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Primary key identifier,
   "name" VARCHAR(255) NOT NULL,
   "code" VARCHAR(255) NOT NULL,
-  "country_id" UUID NOT NULL,
+  "countryId" UUID NOT NULL,
   "status" VARCHAR(255) NOT NULL,
   "createdAt" TIMESTAMPTZ NOT NULL,
   "updatedAt" TIMESTAMPTZ NOT NULL

@@ -4,7 +4,7 @@ spring:
   profiles:
     active: local
   r2dbc:
-    url: ${DB_URL:r2dbc:{{database.sgbd}}://localhost:{{database.port}}/{{project.general.name}}_db}
+    url: ${DB_URL:r2dbc:{{database.sgbd}}://localhost:{{database.port}}/{{project.general.name_underscore}}_db}
     username: ${DB_USERNAME:{{database.username}}}
     password: ${DB_PASSWORD:{{database.password}}}
   data:
@@ -12,14 +12,13 @@ spring:
       repositories:
         enabled: true
   flyway:
-    url: ${FLYWAY_URL:jdbc:{{database.sgbd}}://localhost:{{database.port}}/{{project.general.name}}_db}
+    url: ${FLYWAY_URL:jdbc:{{database.sgbd}}://localhost:{{database.port}}/{{project.general.name_underscore}}_db}
     user: ${DB_USERNAME:{{database.username}}}
     password: ${DB_PASSWORD:{{database.password}}}
     locations: classpath:db/migration
     baseline-on-migrate: true
-    validate-on-migrate: true
+    validate-on-migrate: false
     enabled: true
-    create-schemas: true
 
 server:
   port: {{server.port}}

@@ -10,8 +10,7 @@ BEGIN
     IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'movies') THEN
         EXECUTE '
             CREATE TABLE public."movies" (
-              "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Unique identifier,
-  "movie_id" UUID NOT NULL,
+              "movieId" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Primary key identifier,
   "title" VARCHAR(255) NOT NULL,
   "director" VARCHAR(255) NOT NULL,
   "genre" VARCHAR(255) NOT NULL,
@@ -38,10 +37,9 @@ BEGIN
     IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'rentals') THEN
         EXECUTE '
             CREATE TABLE public."rentals" (
-              "id" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Unique identifier,
-  "rental_id" UUID NOT NULL,
-  "movie_id" UUID NOT NULL,
-  "user_id" UUID NOT NULL,
+              "rentalId" UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Primary key identifier,
+  "movieId" UUID NOT NULL,
+  "userId" UUID NOT NULL,
   "rentalDate" TIMESTAMPTZ NOT NULL,
   "dueDate" TIMESTAMPTZ NOT NULL,
   "returnDate" TIMESTAMPTZ,

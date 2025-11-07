@@ -31,23 +31,30 @@ class SqlGenerator:
         # Add table comment
         result = f"-- {table_description}\n"
         
-        # Always add UUID primary key as 'id'
-        uuid_pk_type = get_sql_type({'type': 'uuid_pk'}, self.dialect)
-        columns.append(f'"id" {uuid_pk_type} -- Unique identifier')
+        # Process properties to find primary key
+        primary_key_field = None
+        for prop_name in properties.keys():
+            if prop_name.endswith('Id') or prop_name == 'id':
+                primary_key_field = prop_name
+                break
         
-        # Process properties (skip ID fields)
+        # Process properties
         for prop_name, prop_def in properties.items():
             field_description = self._clean_sql_comment(prop_def.get('description', ''))
             comment = f' -- {field_description}' if field_description else ''
             
-            # Skip ID fields - they will be foreign keys or references
-            if prop_name.endswith('Id'):
-                # Convert to foreign key reference
-                fk_name = prop_name.replace('Id', '_id')
-                sql_type = 'UUID'
-                if prop_name in required_fields:
-                    sql_type += ' NOT NULL'
-                columns.append(f'"{fk_name}" {sql_type}{comment}')
+            # Handle ID fields
+            if prop_name.endswith('Id') or prop_name == 'id':
+                if prop_name == primary_key_field:
+                    # This is the primary key
+                    uuid_pk_type = get_sql_type({'type': 'uuid_pk'}, self.dialect)
+                    columns.append(f'"{prop_name}" {uuid_pk_type} -- Primary key identifier{comment}')
+                else:
+                    # This is a foreign key
+                    sql_type = 'UUID'
+                    if prop_name in required_fields:
+                        sql_type += ' NOT NULL'
+                    columns.append(f'"{prop_name}" {sql_type}{comment}')
                 continue
             
             # Handle timestamp fields

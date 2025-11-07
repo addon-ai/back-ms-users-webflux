@@ -44,10 +44,16 @@ services:
     environment:
       # Force local profile for Docker Compose
       SPRING_PROFILES_ACTIVE: local
-      # Override database host for container networking
+      
+      # Database connection variables
       SPRING_DATASOURCE_URL: jdbc:{{database.sgbd}}://{{database.sgbd}}:{{database.port}}/{{project.general.name_underscore}}_db
       SPRING_DATASOURCE_USERNAME: {{database.username}}
       SPRING_DATASOURCE_PASSWORD: {{database.password}}
+
+      # Reduced logging level from DEBUG to INFO
+      LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_JDBC: INFO
+      LOGGING_LEVEL_ORG_FLYWAYDB: INFO
+
       # JVM settings for development
       JAVA_OPTS: "-Xmx512m -Xms256m -XX:+UseG1GC"
     ports:

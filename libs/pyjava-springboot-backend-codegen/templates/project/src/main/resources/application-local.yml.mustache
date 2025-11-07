@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:{{database.sgbd}}://localhost:{{database.port}}/{{project.general.name_underscore}}_db
-    username: {{database.username}}
-    password: {{database.password}}
+    url: ${SPRING_DATASOURCE_URL:jdbc:{{database.sgbd}}://localhost:{{database.port}}/{{project.general.name_underscore}}_db}
+    username: ${SPRING_DATASOURCE_USERNAME:{{database.username}}}
+    password: ${SPRING_DATASOURCE_PASSWORD:{{database.password}}}
     driver-class-name: {{#database.postgresql}}org.postgresql.Driver{{/database.postgresql}}{{#database.mysql}}com.mysql.cj.jdbc.Driver{{/database.mysql}}{{#database.oracle}}oracle.jdbc.OracleDriver{{/database.oracle}}{{#database.sqlserver}}com.microsoft.sqlserver.jdbc.SQLServerDriver{{/database.sqlserver}}
   jpa:
     database-platform: {{#database.postgresql}}org.hibernate.dialect.PostgreSQLDialect{{/database.postgresql}}{{#database.mysql}}org.hibernate.dialect.MySQL8Dialect{{/database.mysql}}{{#database.oracle}}org.hibernate.dialect.Oracle12cDialect{{/database.oracle}}{{#database.sqlserver}}org.hibernate.dialect.SQLServerDialect{{/database.sqlserver}}
@@ -23,8 +23,9 @@ server:
 
 logging:
   level:
-    root: DEBUG
-    org.springframework.security: DEBUG
+    # Changed from DEBUG to INFO to hide the auto-configuration report
+    root: INFO
+    org.springframework.security: INFO
 
 springdoc:
   api-docs:

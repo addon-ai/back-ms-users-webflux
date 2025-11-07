@@ -26,7 +26,7 @@ class SqlGenerator:
         columns = []
         required_fields = schema_def.get('required', [])
         properties = schema_def.get('properties', {})
-        table_description = schema_def.get('description', f'Table for {table_name}').replace('&#39;', '')
+        table_description = schema_def.get('description', f'Table for {table_name}').replace('&#39;', '').replace(',', '')
         
         # Add table comment
         result = f"-- {table_description}\n"
@@ -37,7 +37,7 @@ class SqlGenerator:
         
         # Process properties (skip ID fields)
         for prop_name, prop_def in properties.items():
-            field_description = prop_def.get('description', '').replace('&#39;', '')
+            field_description = prop_def.get('description', '').replace('&#39;', '').replace(',', '')
             comment = f' -- {field_description}' if field_description else ''
             
             # Skip ID fields - they will be foreign keys or references
@@ -115,7 +115,7 @@ class SqlGenerator:
         
         for field in search_fields:
             index_name = f"idx_{table_name}_{field}"
-            field_description = properties.get(field, {}).get('description', f'Index for {field} field').replace('&#39;', '')
+            field_description = properties.get(field, {}).get('description', f'Index for {field} field').replace('&#39;', '').replace(',', '')
             indexes.append(f'CREATE INDEX "{index_name}" ON "{table_name}" ("{field}"); -- {field_description}')
         
         return indexes
@@ -124,7 +124,7 @@ class SqlGenerator:
         """Generate enum table with INSERT statements."""
         enum_values = schema_def.get('enum_values', [])
         original_name = schema_def.get('original_name', table_name)
-        enum_description = schema_def.get('description', f'Enumeration table for {original_name}').replace('&#39;', '')
+        enum_description = schema_def.get('description', f'Enumeration table for {original_name}').replace('&#39;', '').replace(',', '')
         
         # Create table structure with documentation
         uuid_pk_type = get_sql_type({'type': 'uuid_pk'}, self.dialect)
@@ -150,7 +150,7 @@ class SqlGenerator:
         for value in enum_values:
             # Convert enum value to readable name
             name = value.replace('_', ' ').title()
-            description = f"{original_name} - {name}".replace('&#39;', '')
+            description = f"{original_name} - {name}".replace('&#39;', '').replace(',', '')
             
             insert_stmt = f"INSERT INTO \"{table_name}\" (code, name, description) VALUES ('{value}', '{name}', '{description}');"
             inserts.append(insert_stmt)
@@ -172,7 +172,7 @@ class SqlGenerator:
         
         for value in enum_values:
             name = value.replace('_', ' ').title()
-            description = f"{original_name} - {name}".replace('&#39;', '')
+            description = f"{original_name} - {name}".replace('&#39;', '').replace(',', '')
             insert_stmt = f"INSERT INTO \"{table_name}\" (code, name, description) VALUES ('{value}', '{name}', '{description}');"
             inserts.append(insert_stmt)
         

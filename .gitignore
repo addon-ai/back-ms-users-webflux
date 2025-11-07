@@ -436,7 +436,6 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,intellij+all,python,jupyternotebooks,java,maven,gradle,linux,windows
 
 # Generated content
-docs/
 build/
 schemas/
 target/

@@ -1,0 +1,257 @@
+@startuml PyJava Backend Code Generator - Component Diagram
+
+!define RECTANGLE class
+
+package "PyJava Backend Code Generator" {
+    
+    package "Core Layer" {
+        RECTANGLE CodeGenerator {
+            +generate_complete_project()
+            +_extract_openapi_data()
+            +_generate_domain_layer()
+            +_generate_application_layer()
+            +_generate_infrastructure_layer()
+            +_generate_supporting_files()
+        }
+        
+        RECTANGLE ConfigLoader {
+            +build_package_structure()
+            +build_mustache_context()
+            +load_project_config()
+        }
+        
+        RECTANGLE OpenApiProcessor {
+            +load_openapi_specs()
+            +extract_schemas()
+            +extract_operations()
+            +extract_entities()
+        }
+    }
+    
+    package "Generator Layer" {
+        RECTANGLE DtoGenerator {
+            +generate_dto()
+            +generate_composite_request_dtos()
+            +_build_dto_properties()
+        }
+        
+        RECTANGLE DomainGenerator {
+            +generate_domain_model()
+            +generate_domain_port_output()
+            +generate_entity_status_enum()
+        }
+        
+        RECTANGLE ApplicationGenerator {
+            +generate_mapper()
+            +generate_consolidated_use_cases()
+            +generate_consolidated_service()
+            +_detect_relation_mappings()
+        }
+        
+        RECTANGLE InfrastructureGenerator {
+            +generate_entity()
+            +generate_jpa_repository()
+            +generate_repository_adapter()
+            +generate_rest_controller()
+            +generate_exception_classes()
+            +_pluralize_entity_name()
+        }
+        
+        RECTANGLE TestGenerator {
+            +generate_tests_for_existing_components()
+            +generate_service_test()
+            +generate_mapper_test()
+            +generate_repository_adapter_test()
+            +generate_logging_utils_test()
+        }
+        
+        RECTANGLE ProjectGenerator {
+            +generate_main_application()
+            +generate_configuration()
+            +generate_pom_xml()
+            +generate_docker_compose()
+            +generate_maven_wrapper()
+        }
+    }
+    
+    package "Utilities Layer" {
+        RECTANGLE TemplateRenderer {
+            +render_template()
+            +load_template()
+            +_process_mustache()
+        }
+        
+        RECTANGLE FileManager {
+            +write_file()
+            +create_directories()
+            +get_package_path()
+            +check_dto_exists()
+        }
+        
+        RECTANGLE PropertyConverter {
+            +convert_openapi_property()
+            +_map_java_types()
+            +_build_validation_annotations()
+        }
+    }
+    
+    package "Template System" {
+        package "Domain Templates" {
+            RECTANGLE DomainTemplates {
+                pojo.mustache
+                interface.mustache
+                consolidatedUseCase.mustache
+                EntityStatus.mustache
+            }
+        }
+        
+        package "Application Templates" {
+            RECTANGLE ApplicationTemplates {
+                apiService.mustache
+                consolidatedService.mustache
+                apiMapper.mustache
+                dtoRecord.mustache
+                LoggingUtils.mustache
+            }
+        }
+        
+        package "Infrastructure Templates" {
+            RECTANGLE InfrastructureTemplates {
+                apiController.mustache
+                apiEntity.mustache
+                apiRepository.mustache
+                Configuration.mustache
+                SecurityConfiguration.mustache
+            }
+        }
+        
+        package "Test Templates" {
+            RECTANGLE TestTemplates {
+                serviceTest.mustache
+                mapperTest.mustache
+                repositoryAdapterTest.mustache
+                controllerTest.mustache
+                LoggingUtilsTest.mustache
+            }
+        }
+        
+        package "Project Templates" {
+            RECTANGLE ProjectTemplates {
+                Application.mustache
+                pom.xml.mustache
+                application.properties.mustache
+                docker-compose.yml.mustache
+                README.md.mustache
+            }
+        }
+    }
+}
+
+package "External Dependencies" {
+    RECTANGLE OpenAPISpecs {
+        user-service.smithy
+        movie-service.smithy
+        location-service.smithy
+    }
+    
+    RECTANGLE ProjectConfig {
+        template-config.json
+        project-config.json
+    }
+}
+
+package "Generated Output" {
+    package "Hexagonal Architecture Project" {
+        package "Domain Layer" {
+            RECTANGLE DomainOutput {
+                User.java
+                UserRepositoryPort.java
+                UserUseCase.java
+                EntityStatus.java
+            }
+        }
+        
+        package "Application Layer" {
+            RECTANGLE ApplicationOutput {
+                UserService.java
+                UserMapper.java
+                CreateUserRequestContent.java
+                GetUserResponseContent.java
+                LoggingUtils.java
+            }
+        }
+        
+        package "Infrastructure Layer" {
+            RECTANGLE InfrastructureOutput {
+                UserController.java
+                UserDbo.java
+                JpaUserRepository.java
+                UserRepositoryAdapter.java
+                ApplicationConfiguration.java
+            }
+        }
+        
+        package "Test Layer" {
+            RECTANGLE TestOutput {
+                UserServiceTest.java
+                UserMapperTest.java
+                UserRepositoryAdapterTest.java
+                UserControllerTest.java
+                LoggingUtilsTest.java
+            }
+        }
+    }
+}
+
+' Core relationships
+CodeGenerator --> ConfigLoader : uses
+CodeGenerator --> OpenApiProcessor : uses
+CodeGenerator --> DtoGenerator : orchestrates
+CodeGenerator --> DomainGenerator : orchestrates
+CodeGenerator --> ApplicationGenerator : orchestrates
+CodeGenerator --> InfrastructureGenerator : orchestrates
+CodeGenerator --> TestGenerator : orchestrates
+CodeGenerator --> ProjectGenerator : orchestrates
+
+' Generator dependencies
+DtoGenerator --> TemplateRenderer : uses
+DtoGenerator --> FileManager : uses
+DtoGenerator --> PropertyConverter : uses
+
+DomainGenerator --> TemplateRenderer : uses
+DomainGenerator --> FileManager : uses
+DomainGenerator --> PropertyConverter : uses
+
+ApplicationGenerator --> TemplateRenderer : uses
+ApplicationGenerator --> FileManager : uses
+
+InfrastructureGenerator --> TemplateRenderer : uses
+InfrastructureGenerator --> FileManager : uses
+InfrastructureGenerator --> PropertyConverter : uses
+
+TestGenerator --> TemplateRenderer : uses
+TestGenerator --> FileManager : uses
+
+ProjectGenerator --> TemplateRenderer : uses
+ProjectGenerator --> FileManager : uses
+
+' Template relationships
+TemplateRenderer --> DomainTemplates : renders
+TemplateRenderer --> ApplicationTemplates : renders
+TemplateRenderer --> InfrastructureTemplates : renders
+TemplateRenderer --> TestTemplates : renders
+TemplateRenderer --> ProjectTemplates : renders
+
+' Input relationships
+OpenApiProcessor --> OpenAPISpecs : processes
+ConfigLoader --> ProjectConfig : loads
+
+' Output relationships
+DtoGenerator --> ApplicationOutput : generates
+DomainGenerator --> DomainOutput : generates
+ApplicationGenerator --> ApplicationOutput : generates
+InfrastructureGenerator --> InfrastructureOutput : generates
+TestGenerator --> TestOutput : generates
+ProjectGenerator --> InfrastructureOutput : generates
+
+@enduml

@@ -1,0 +1,410 @@
+@startuml PyJava Backend Code Generator - Sequence Diagram
+
+actor User
+participant "CodeGenerator" as CG
+participant "ConfigLoader" as CL
+participant "OpenApiProcessor" as OAP
+participant "DtoGenerator" as DTG
+participant "DomainGenerator" as DG
+participant "ApplicationGenerator" as AG
+participant "InfrastructureGenerator" as IG
+participant "TestGenerator" as TG
+participant "ProjectGenerator" as PG
+participant "TemplateRenderer" as TR
+participant "FileManager" as FM
+participant "PropertyConverter" as PC
+
+User -> CG: generate_complete_project()
+
+== Initialization Phase ==
+CG -> CL: build_package_structure(base_package)
+activate CL
+CL --> CG: target_packages
+deactivate CL
+
+CG -> CL: build_mustache_context(project_config, target_packages)
+activate CL
+CL --> CG: mustache_context
+deactivate CL
+
+CG -> OAP: load_openapi_specs()
+activate OAP
+OAP -> OAP: extract_schemas()
+OAP -> OAP: extract_operations()
+OAP -> OAP: extract_entities()
+OAP --> CG: openapi_specs
+deactivate OAP
+
+== Data Extraction Phase ==
+CG -> CG: _extract_openapi_data()
+activate CG
+note right: Processes all OpenAPI specs\nto extract schemas, operations,\nand entities
+CG --> CG: all_schemas, all_operations, all_entities
+deactivate CG
+
+== DTO Generation Phase ==
+CG -> DTG: generate_dto(schema_name, schema_data, service, context)
+activate DTG
+DTG -> PC: convert_openapi_property(prop_name, prop_data, required_fields)
+activate PC
+PC --> DTG: property_info
+deactivate PC
+DTG -> TR: render_template('dtoRecord.mustache', context)
+activate TR
+TR --> DTG: rendered_content
+deactivate TR
+DTG -> FM: write_file(file_path, content)
+activate FM
+FM --> DTG: success
+deactivate FM
+deactivate DTG
+
+CG -> DTG: generate_composite_request_dtos(openapi_specs, context)
+activate DTG
+DTG -> TR: render_template('dtoRecord.mustache', context)
+activate TR
+TR --> DTG: rendered_content
+deactivate TR
+DTG -> FM: write_file(file_path, content)
+activate FM
+FM --> DTG: success
+deactivate FM
+deactivate DTG
+
+== Domain Layer Generation Phase ==
+CG -> DG: generate_entity_status_enum(context)
+activate DG
+DG -> TR: render_template('EntityStatus.mustache', context)
+activate TR
+TR --> DG: rendered_content
+deactivate TR
+DG -> FM: write_file(file_path, content)
+activate FM
+FM --> DG: success
+deactivate FM
+deactivate DG
+
+loop for each entity
+    CG -> DG: generate_domain_model(entity, schema, context)
+    activate DG
+    DG -> PC: convert_openapi_property(prop_name, prop_data, required_fields)
+    activate PC
+    PC --> DG: property_info
+    deactivate PC
+    DG -> TR: render_template('pojo.mustache', context)
+    activate TR
+    TR --> DG: rendered_content
+    deactivate TR
+    DG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> DG: success
+    deactivate FM
+    deactivate DG
+    
+    CG -> DG: generate_domain_port_output(entity, context)
+    activate DG
+    DG -> TR: render_template('interface.mustache', context)
+    activate TR
+    TR --> DG: rendered_content
+    deactivate TR
+    DG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> DG: success
+    deactivate FM
+    deactivate DG
+end
+
+== Application Layer Generation Phase ==
+loop for each entity
+    CG -> AG: generate_mapper(entity, service, openapi_specs, context)
+    activate AG
+    AG -> AG: _detect_relation_mappings(entity, openapi_specs)
+    AG -> FM: check_dto_exists(dto_path, dto_name)
+    activate FM
+    FM --> AG: dto_exists
+    deactivate FM
+    AG -> TR: render_template('apiMapper.mustache', context)
+    activate TR
+    TR --> AG: rendered_content
+    deactivate TR
+    AG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> AG: success
+    deactivate FM
+    deactivate AG
+    
+    CG -> AG: generate_consolidated_use_cases(entity, operations, complex_ops, context)
+    activate AG
+    AG -> TR: render_template('consolidatedUseCase.mustache', context)
+    activate TR
+    TR --> AG: rendered_content
+    deactivate TR
+    AG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> AG: success
+    deactivate FM
+    deactivate AG
+    
+    CG -> AG: generate_consolidated_service(entity, operations, complex_ops, context)
+    activate AG
+    AG -> TR: render_template('consolidatedService.mustache', context)
+    activate TR
+    TR --> AG: rendered_content
+    deactivate TR
+    AG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> AG: success
+    deactivate FM
+    deactivate AG
+end
+
+== Infrastructure Layer Generation Phase ==
+CG -> IG: generate_conflict_exception(context)
+activate IG
+IG -> TR: render_template('ConflictException.mustache', context)
+activate TR
+TR --> IG: rendered_content
+deactivate TR
+IG -> FM: write_file(file_path, content)
+activate FM
+FM --> IG: success
+deactivate FM
+deactivate IG
+
+CG -> IG: generate_internal_server_error_exception(context)
+activate IG
+IG -> TR: render_template('InternalServerErrorException.mustache', context)
+activate TR
+TR --> IG: rendered_content
+deactivate TR
+IG -> FM: write_file(file_path, content)
+activate FM
+FM --> IG: success
+deactivate FM
+deactivate IG
+
+loop for each entity
+    CG -> IG: generate_entity(entity, schema, context)
+    activate IG
+    IG -> PC: convert_openapi_property(prop_name, prop_data, required_fields)
+    activate PC
+    PC --> IG: property_info
+    deactivate PC
+    IG -> IG: _pluralize_entity_name(entity)
+    IG -> TR: render_template('apiEntity.mustache', context)
+    activate TR
+    TR --> IG: rendered_content
+    deactivate TR
+    IG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> IG: success
+    deactivate FM
+    deactivate IG
+    
+    CG -> IG: generate_jpa_repository(entity, schema, context)
+    activate IG
+    IG -> TR: render_template('apiRepository.mustache', context)
+    activate TR
+    TR --> IG: rendered_content
+    deactivate TR
+    IG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> IG: success
+    deactivate FM
+    deactivate IG
+    
+    CG -> IG: generate_repository_adapter(entity, context)
+    activate IG
+    IG -> IG: _pluralize_entity_name(entity)
+    IG -> TR: render_template('apiRepository.mustache', context)
+    activate TR
+    TR --> IG: rendered_content
+    deactivate TR
+    IG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> IG: success
+    deactivate FM
+    deactivate IG
+    
+    CG -> IG: generate_rest_controller(entity, operations, service, context)
+    activate IG
+    IG -> TR: render_template('apiController.mustache', context)
+    activate TR
+    TR --> IG: rendered_content
+    deactivate TR
+    IG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> IG: success
+    deactivate FM
+    deactivate IG
+end
+
+== Test Generation Phase ==
+CG -> FM: create_test_directories()
+activate FM
+FM --> CG: success
+deactivate FM
+
+CG -> TG: generate_tests_for_existing_components(context)
+activate TG
+
+TG -> TG: _find_existing_mappers()
+loop for each mapper
+    TG -> TG: generate_mapper_test(entity, service, context)
+    TG -> TR: render_template('mapperTest.mustache', context)
+    activate TR
+    TR --> TG: rendered_content
+    deactivate TR
+    TG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> TG: success
+    deactivate FM
+end
+
+TG -> TG: _find_existing_services()
+loop for each service
+    TG -> TG: generate_service_test(entity, service, operations, context)
+    TG -> TR: render_template('serviceTest.mustache', context)
+    activate TR
+    TR --> TG: rendered_content
+    deactivate TR
+    TG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> TG: success
+    deactivate FM
+end
+
+TG -> TG: _find_existing_repository_adapters()
+loop for each repository adapter
+    TG -> TG: generate_repository_adapter_test(entity, service, context)
+    TG -> TG: _pluralize_entity_name(entity)
+    TG -> TR: render_template('repositoryAdapterTest.mustache', context)
+    activate TR
+    TR --> TG: rendered_content
+    deactivate TR
+    TG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> TG: success
+    deactivate FM
+end
+
+TG -> TG: _find_existing_controllers()
+loop for each controller
+    TG -> TG: generate_controller_test(entity, service, operations, context)
+    TG -> TR: render_template('controllerTest.mustache', context)
+    activate TR
+    TR --> TG: rendered_content
+    deactivate TR
+    TG -> FM: write_file(file_path, content)
+    activate FM
+    FM --> TG: success
+    deactivate FM
+end
+
+deactivate TG
+
+CG -> TG: generate_logging_utils_test(context)
+activate TG
+TG -> TR: render_template('LoggingUtilsTest.mustache', context)
+activate TR
+TR --> TG: rendered_content
+deactivate TR
+TG -> FM: write_file(file_path, content)
+activate FM
+FM --> TG: success
+deactivate FM
+deactivate TG
+
+CG -> TG: generate_logback_test_config(context)
+activate TG
+TG -> TR: render_template('logback-test.xml.mustache', context)
+activate TR
+TR --> TG: rendered_content
+deactivate TR
+TG -> FM: write_file(file_path, content)
+activate FM
+FM --> TG: success
+deactivate FM
+deactivate TG
+
+== Project Structure Generation Phase ==
+CG -> PG: generate_main_application(context)
+activate PG
+PG -> TR: render_template('Application.mustache', context)
+activate TR
+TR --> PG: rendered_content
+deactivate TR
+PG -> FM: write_file(file_path, content)
+activate FM
+FM --> PG: success
+deactivate FM
+deactivate PG
+
+CG -> PG: generate_configuration(context)
+activate PG
+PG -> TR: render_template('Configuration.mustache', context)
+activate TR
+TR --> PG: rendered_content
+deactivate TR
+PG -> FM: write_file(file_path, content)
+activate FM
+FM --> PG: success
+deactivate FM
+deactivate PG
+
+CG -> PG: generate_pom_xml(context)
+activate PG
+PG -> TR: render_template('pom.xml.mustache', context)
+activate TR
+TR --> PG: rendered_content
+deactivate TR
+PG -> FM: write_file(file_path, content)
+activate FM
+FM --> PG: success
+deactivate FM
+deactivate PG
+
+CG -> PG: generate_application_properties(context)
+activate PG
+PG -> TR: render_template('application.properties.mustache', context)
+activate TR
+TR --> PG: rendered_content
+deactivate TR
+PG -> FM: write_file(file_path, content)
+activate FM
+FM --> PG: success
+deactivate FM
+deactivate PG
+
+CG -> PG: generate_docker_compose(context)
+activate PG
+PG -> TR: render_template('docker-compose.yml.mustache', context)
+activate TR
+TR --> PG: rendered_content
+deactivate TR
+PG -> FM: write_file(file_path, content)
+activate FM
+FM --> PG: success
+deactivate FM
+deactivate PG
+
+CG -> PG: generate_maven_wrapper(context)
+activate PG
+PG -> TR: render_template('mvnw.mustache', context)
+activate TR
+TR --> PG: rendered_content
+deactivate TR
+PG -> FM: write_file(file_path, content)
+activate FM
+FM --> PG: success
+deactivate FM
+deactivate PG
+
+== Summary Phase ==
+CG -> CG: _print_generation_summary(schemas, operations, entities)
+activate CG
+note right: Prints project statistics:\n- Generated DTOs count\n- Generated entities\n- Generated operations\n- Project structure info
+CG --> User: Generation Complete
+deactivate CG
+
+@enduml

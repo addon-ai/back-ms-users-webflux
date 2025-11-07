@@ -1,0 +1,164 @@
+@startuml Pipeline Activity Diagram
+!theme plain
+skinparam activity {
+    BackgroundColor #E1F5FE
+    BorderColor #0277BD
+    FontColor #01579B
+}
+skinparam activityDiamond {
+    BackgroundColor #FFF3E0
+    BorderColor #F57C00
+}
+
+title Code Generation Pipeline Activity Diagram
+
+start
+
+:🚀 Initialize Pipeline;
+note right
+  - Get script directory
+  - Set project root
+  - Define config paths
+end note
+
+:📋 Load Project Configuration;
+note right
+  Read params.json array
+  Extract first project name
+end note
+
+:🌿 Create Pipeline Branch;
+note right
+  Execute libs/utils/branch_manager.py
+  Create timestamped feature branch
+end note
+
+:🔍 Check Python 3 Availability;
+
+if (Python 3 available?) then (no)
+  :❌ Exit with error;
+  stop
+else (yes)
+  :✅ Python 3 confirmed;
+endif
+
+:📦 Check Dependencies;
+note right
+  - pystache
+  - requests
+end note
+
+if (Dependencies missing?) then (yes)
+  :📥 Install missing dependencies;
+else (no)
+  :✅ Dependencies satisfied;
+endif
+
+:🔍 Check Existing Projects;
+
+if (GitHub token set AND projects exist?) then (yes)
+  :🔒 Backup Git history;
+  note right
+    Execute py-github-integration.py
+    with --backup-only flag
+  end note
+else (no)
+  :🗑️ Clean existing projects;
+  note right
+    Remove projects/ directory
+  end note
+endif
+
+:🏗️ Generate Java Backend Projects;
+note right
+  Execute libs/utils/process_projects.py
+  - SpringBoot or WebFlux
+  - Hexagonal architecture
+  - Based on project type in config
+end note
+
+:📋 Generate JSON Schemas;
+note right
+  Execute jsonschema-generator.py
+  From OpenAPI specifications
+end note
+
+:🎲 Generate Fake Data;
+note right
+  Execute fake-data-generator.py
+  For unit testing
+end note
+
+:📚 Generate OpenAPI Documentation;
+note right
+  Execute pyopenapi-docs-generator.py
+  PlantUML, Markdown, TXT formats
+end note
+
+:🏗️ Generate Architectural Diagrams;
+note right
+  Execute pyarchitect-docs-generator.py
+  - Component diagrams
+  - Sequence diagrams
+end note
+
+:🗄️ Generate SQL DDL Scripts;
+note right
+  Execute pygenerate-sql-from-openapi.py
+  From OpenAPI specifications
+end note
+
+:📋 Copy Flyway Migration Scripts;
+note right
+  Execute libs/utils/flyway_migration_copier.py
+  - Read flywayScripts from params.json
+  - Copy from sql/{sgbd}/ to projects
+  - Merge into V1__initial_schema.sql
+  - Place in main/test migration dirs
+end note
+
+:🔍 Check GitHub Integration;
+
+if (GitHub enabled in config?) then (yes)
+  if (GitHub token set?) then (yes)
+    :🐙 Synchronize with GitHub;
+    note right
+      Execute py-github-integration.py
+      - Create/update repositories
+      - Push generated code
+    end note
+    
+    :🔒 Apply Branch Protection;
+    note right
+      Execute apply_branch_protection.py
+      Protect main branches
+    end note
+  else (no)
+    :⚠️ Skip GitHub sync;
+    note right
+      GITHUB_TOKEN not set
+    end note
+  endif
+else (no)
+  :⚠️ GitHub integration disabled;
+endif
+
+:💾 Commit Pipeline Changes;
+note right
+  Execute libs/utils/branch_manager.py --commit
+  Commit all generated files
+end note
+
+:🎉 Pipeline Complete;
+note right
+  Generated outputs:
+  - Java projects
+  - JSON schemas
+  - Documentation
+  - SQL scripts
+  - GitHub repositories
+end note
+
+stop
+
+@enduml

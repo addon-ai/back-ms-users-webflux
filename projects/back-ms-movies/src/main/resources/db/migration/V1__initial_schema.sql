@@ -6,7 +6,7 @@
 
 -- Table for movies
 CREATE TABLE IF NOT EXISTS movies (
-    movieId UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Primary key identifier,
+    movieId UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier,
     title VARCHAR(255) NOT NULL,
     director VARCHAR(255) NOT NULL,
     genre VARCHAR(255) NOT NULL,
@@ -26,7 +26,7 @@ CREATE INDEX IF NOT EXISTS idx_movies_status ON movies (status); -- Index for st
 
 -- Table for rentals
 CREATE TABLE IF NOT EXISTS rentals (
-    rentalId UUID DEFAULT gen_random_uuid() PRIMARY KEY -- Primary key identifier,
+    rentalId UUID DEFAULT gen_random_uuid() PRIMARY KEY, -- Primary key identifier,
     movieId UUID NOT NULL,
     userId UUID NOT NULL,
     rentalDate TIMESTAMPTZ NOT NULL,

@@ -26,6 +26,8 @@ public interface UserRepositoryPort {
     
     Flux<User> findBySearchTerm(String search, Integer page, Integer size);
     
+    Flux<User> findAllPaged(Integer page, Integer size);
+    
     Mono<Void> deleteById(String id);
     
     Mono<Boolean> existsById(String id);

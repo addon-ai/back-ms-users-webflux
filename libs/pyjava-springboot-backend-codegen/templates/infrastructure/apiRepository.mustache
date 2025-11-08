@@ -184,7 +184,25 @@ public class {{classname}} implements {{portName}} {
                 .map(mapper::toDomain);
     }
     
-    public Page<{{entityName}}> findAllPaged(org.springframework.data.domain.Pageable pageable) {
+    @Override
+    public List<{{entityName}}> findAllPaged(Integer page, Integer size) {
+        log.debug("Finding all {{entityNamePlural}} with pagination: page={}, size={}", page, size);
+        try {
+            org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                page != null && page > 0 ? page - 1 : 0, 
+                size != null && size > 0 ? size : 20
+            );
+            
+            return jpaRepository.findAllPaged(pageable)
+                    .map(mapper::toDomain)
+                    .getContent();
+        } catch (Exception e) {
+            log.error("Database error while finding all {{entityNamePlural}}: {}", e.getMessage(), e);
+            throw new InternalServerErrorException("Failed to find all {{entityNamePlural}}", e);
+        }
+    }
+    
+    public Page<{{entityName}}> findAllPagedInternal(org.springframework.data.domain.Pageable pageable) {
         log.debug("Finding all {{entityNamePlural}} with pagination: {}", pageable);
         return jpaRepository.findAllPaged(pageable)
                 .map(mapper::toDomain);

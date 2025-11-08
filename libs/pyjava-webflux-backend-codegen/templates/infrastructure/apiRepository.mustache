@@ -178,6 +178,19 @@ public class {{classname}} implements {{portName}} {
                 .onErrorMap(e -> new InternalServerErrorException("Failed to count {{entityNamePlural}}", e));
     }
     
+    @Override
+    public Flux<{{entityName}}> findAllPaged(Integer page, Integer size) {
+        log.debug("Finding all {{entityNamePlural}} with pagination: page={}, size={}", page, size);
+        
+        long limit = size != null && size > 0 ? size : 20L;
+        long offset = page != null && page > 0 ? (page - 1) * limit : 0L;
+        
+        return r2dbcRepository.findAllPaged(limit, offset)
+                .map(mapper::toDomain)
+                .doOnError(e -> log.error("Database error while finding all {{entityNamePlural}}: {}", e.getMessage(), e))
+                .onErrorMap(this::mapRepositoryException);
+    }
+    
     public Mono<Long> countAll() {
         log.debug("Counting all {{entityNamePlural}}");
         return r2dbcRepository.countAll()

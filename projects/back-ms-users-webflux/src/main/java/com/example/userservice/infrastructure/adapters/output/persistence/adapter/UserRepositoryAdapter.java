@@ -67,6 +67,7 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
 
     @Override
     public Flux<User> findAll() {
+        log.info("Entering findAll method");
         log.debug("Finding all Users");
         return r2dbcRepository.findAll()
                 .map(mapper::toDomain)
@@ -116,5 +117,18 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
         return r2dbcRepository.countAll()
                 .doOnError(e -> log.error("Database error while counting all Users: {}", e.getMessage(), e))
                 .onErrorMap(e -> new InternalServerErrorException("Failed to count all Users", e));
+    }
+    
+    @Override
+    public Flux<User> findAllPaged(Integer page, Integer size) {
+        log.debug("Finding all Users with pagination - page: {}, size: {}", page, size);
+        
+        long limit = size != null && size > 0 ? size : 20L;
+        long offset = page != null && page > 0 ? (page - 1) * limit : 0L;
+        
+        return r2dbcRepository.findAllPaged(limit, offset)
+                .map(mapper::toDomain)
+                .doOnError(e -> log.error("Database error while finding paginated Users: {}", e.getMessage(), e))
+                .onErrorMap(this::mapRepositoryException);
     }
 }

@@ -127,11 +127,11 @@ public class {{classname}} implements {{operationName}}UseCase {
         
         if (search != null && !search.trim().isEmpty()) {
             countMono = (({{entityName}}RepositoryAdapter) {{entityVarName}}RepositoryPort).countBySearchTerm(search);
+            {{entityVarName}}Flux = {{entityVarName}}RepositoryPort.findBySearchTerm(search, pageNum, pageSize);
         } else {
             countMono = (({{entityName}}RepositoryAdapter) {{entityVarName}}RepositoryPort).countAll();
-            search = ""; // Ensure empty string for query
+            {{entityVarName}}Flux = {{entityVarName}}RepositoryPort.findAllPaged(pageNum, pageSize);
         }
-        {{entityVarName}}Flux = {{entityVarName}}RepositoryPort.findBySearchTerm(search, pageNum, pageSize);
         
         return Mono.zip(
                 {{entityVarName}}Flux.collectList(),

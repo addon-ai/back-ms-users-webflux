@@ -103,7 +103,7 @@ public class UserService implements UserUseCase {
         if (search != null && !search.trim().isEmpty()) {
             userFlux = userRepositoryPort.findBySearchTerm(search, page, size);
         } else {
-            userFlux = userRepositoryPort.findAll();
+            userFlux = userRepositoryPort.findAllPaged(page, size);
         }
         
         return userFlux

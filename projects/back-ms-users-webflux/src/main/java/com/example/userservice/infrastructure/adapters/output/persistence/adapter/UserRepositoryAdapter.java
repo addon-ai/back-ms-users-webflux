@@ -10,6 +10,7 @@ import com.example.userservice.infrastructure.config.exceptions.InternalServerEr
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.dao.DuplicateKeyException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import java.util.UUID;
@@ -41,7 +42,13 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 .flatMap(r2dbcRepository::save)
                 .map(mapper::toDomain)
                 .doOnError(e -> log.error("Database error while saving User: {}", e.getMessage(), e))
-                .onErrorMap(e -> new InternalServerErrorException("Failed to save User", e));
+                .onErrorMap(ex -> {
+                    // Allow DuplicateKeyException to propagate for proper handling in service layer
+                    if (ex instanceof DuplicateKeyException) {
+                        return ex;
+                    }
+                    return new InternalServerErrorException("Failed to save User", ex);
+                });
     }
 
     @Override

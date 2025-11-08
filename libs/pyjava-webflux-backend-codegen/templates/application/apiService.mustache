@@ -8,6 +8,7 @@ import {{domain_model}}.{{entityName}};
 import {{application_mapper}}.{{entityName}}Mapper;
 import {{infra_config_exceptions}}.NotFoundException;
 import {{infra_config_exceptions}}.ConflictException;
+import org.springframework.dao.DuplicateKeyException;
 import {{utils}}.LoggingUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -73,24 +74,24 @@ public class {{classname}} implements {{operationName}}UseCase {
         // Convert request to domain model using mapper
         {{entityName}} {{entityVarName}} = {{entityVarName}}Mapper.fromCreateRequest(request);
         
-        // Check if entity already exists to prevent conflicts
-        Mono<Boolean> existsCheck = {{entityVarName}}.get{{entityName}}Id() != null 
-            ? {{entityVarName}}RepositoryPort.existsById({{entityVarName}}.get{{entityName}}Id())
-            : Mono.just(false);
-        
-        return existsCheck
-                .flatMap(exists -> {
-                    if (exists) {
-                        return Mono.error(new ConflictException("{{entityName}} with ID " + {{entityVarName}}.get{{entityName}}Id() + " already exists"));
-                    }
-                    return {{entityVarName}}RepositoryPort.save({{entityVarName}});
-                })
+        return {{entityVarName}}RepositoryPort.save({{entityVarName}})
                 .map(saved{{entityName}} -> {
                     logger.info("{{entityName}} created successfully with ID: {}", saved{{entityName}}.get{{entityName}}Id());
                     return ({{returnType}}) {{entityVarName}}Mapper.toDto(saved{{entityName}});
                 })
+                .onErrorMap(org.springframework.dao.DuplicateKeyException.class, this::mapDuplicateKeyException)
                 .doOnError(ConflictException.class, e -> logger.error("{{entityName}} conflict in {{operationName}}", e, request))
                 .doOnError(Exception.class, e -> logger.error("Error in {{operationName}}", e, request));
+    }
+    
+    private ConflictException mapDuplicateKeyException(org.springframework.dao.DuplicateKeyException ex) {
+        String message = ex.getMessage().toLowerCase();
+        if (message.contains("username")) {
+            return new ConflictException("Username already exists");
+        } else if (message.contains("email")) {
+            return new ConflictException("Email already exists");
+        }
+        return new ConflictException("{{entityName}} data conflicts with existing records");
         {{/isCreate}}
         {{#isGet}}
         return {{entityVarName}}RepositoryPort.findById(request)

@@ -94,6 +94,9 @@ public class {{classname}} implements {{portName}} {
             {{entityName}}Dbo dbo = mapper.toDbo({{entityVarName}});
             {{entityName}}Dbo savedDbo = jpaRepository.save(dbo);
             return mapper.toDomain(savedDbo);
+        } catch (org.springframework.dao.DuplicateKeyException | org.springframework.dao.DataIntegrityViolationException e) {
+            log.error("Database constraint violation while saving {{entityName}}: {}", e.getMessage(), e);
+            throw e; // Propagate business exceptions to service layer
         } catch (Exception e) {
             log.error("Database error while saving {{entityName}}: {}", e.getMessage(), e);
             throw new InternalServerErrorException("Failed to save {{entityName}}", e);

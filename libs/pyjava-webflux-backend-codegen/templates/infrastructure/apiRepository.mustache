@@ -102,7 +102,19 @@ public class {{classname}} implements {{portName}} {
                 .flatMap(r2dbcRepository::save)
                 .map(mapper::toDomain)
                 .doOnError(e -> log.error("Database error while saving {{entityName}}: {}", e.getMessage(), e))
-                .onErrorMap(e -> new InternalServerErrorException("Failed to save {{entityName}}", e));
+                .onErrorMap(this::mapRepositoryException);
+    }
+
+    private Throwable mapRepositoryException(Throwable ex) {
+        // Business logic exceptions - propagate to service layer
+        if (ex instanceof org.springframework.dao.DuplicateKeyException) {
+            return ex;
+        }
+        if (ex instanceof org.springframework.dao.DataIntegrityViolationException) {
+            return ex;
+        }
+        // Technical exceptions - convert to infrastructure errors
+        return new InternalServerErrorException("Failed to save {{entityName}}", ex);
     }
 
     @Override

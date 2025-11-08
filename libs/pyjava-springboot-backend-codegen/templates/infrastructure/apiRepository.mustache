@@ -36,14 +36,15 @@ public interface {{classname}} extends JpaRepository<{{entityName}}Dbo, UUID> {
      * {{/hasSearchFields}}
      */
     @Query("SELECT e FROM {{tableName}} e WHERE " +
-           "(:search IS NULL OR " +
-           "{{searchQuery}})")
+           "(:search IS NULL OR :search = '' OR " +
+           "{{searchQuery}}) " +
+           "ORDER BY e.createdAt DESC")
     Page<{{entityName}}Dbo> findBySearchTerm(@Param("search") String search, Pageable pageable);
     
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT e FROM {{tableName}} e")
+    @Query("SELECT e FROM {{tableName}} e ORDER BY e.createdAt DESC")
     Page<{{entityName}}Dbo> findAllPaged(Pageable pageable);
 }
 {{/isJpaRepository}}

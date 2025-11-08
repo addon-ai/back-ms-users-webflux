@@ -29,4 +29,10 @@ public interface UserRepositoryPort {
     Mono<Void> deleteById(String id);
     
     Mono<Boolean> existsById(String id);
+    
+    Mono<Long> countAll();
+    
+    Mono<Long> countBySearchTerm(String search);
+    
+    Flux<User> findAllPaged(Long limit, Long offset);
 }

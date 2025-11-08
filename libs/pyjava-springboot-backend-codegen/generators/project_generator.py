@@ -159,7 +159,10 @@ class ProjectGenerator:
         file_path = self.output_dir / "docker-compose.yml"
         self.file_manager.write_file(file_path, content)
     
-
+    def generate_database_init_script(self, mustache_context: Dict[str, Any]):
+        """Generate database initialization script for Docker."""
+        # Skip generating init-db.sql in project root
+        pass
     
     def generate_dockerfile(self, mustache_context: Dict[str, Any]):
         """Generate Dockerfile."""

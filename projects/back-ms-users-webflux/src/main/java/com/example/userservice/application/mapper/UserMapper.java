@@ -92,23 +92,27 @@ public interface UserMapper {
     }
     
     // Pagination support for list responses
-    default ListUsersResponseContent toListResponse(List<User> domains, int page, int size) {
+    default ListUsersResponseContent toListResponse(List<User> domains, int page, int size, int totalCount) {
         if (domains == null) return null;
         
-        int total = domains.size();
-        int totalPages = (int) Math.ceil((double) total / size);
+        int totalPages = (int) Math.ceil((double) totalCount / size);
         
         return ListUsersResponseContent.builder()
             .users(toDtoList(domains))
             .page(java.math.BigDecimal.valueOf(page))
             .size(java.math.BigDecimal.valueOf(size))
-            .total(java.math.BigDecimal.valueOf(total))
+            .total(java.math.BigDecimal.valueOf(totalCount))
             .totalPages(java.math.BigDecimal.valueOf(totalPages))
             .build();
     }
     
+    // Overloaded method with default pagination (backward compatibility)
+    default ListUsersResponseContent toListResponse(List<User> domains, int page, int size) {
+        return toListResponse(domains, page, size, domains != null ? domains.size() : 0);
+    }
+    
     // Overloaded method with default pagination
     default ListUsersResponseContent toListResponse(List<User> domains) {
-        return toListResponse(domains, 1, domains != null ? domains.size() : 0);
+        return toListResponse(domains, 1, domains != null ? domains.size() : 0, domains != null ? domains.size() : 0);
     }
 }

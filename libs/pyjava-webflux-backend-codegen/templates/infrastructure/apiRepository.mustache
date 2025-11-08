@@ -34,9 +34,10 @@ public interface {{classname}} extends R2dbcRepository<{{entityName}}Dbo, UUID> 
      * Searches by ID when no text fields are available.
      * {{/hasSearchFields}}
      */
-    @Query("SELECT * FROM {{tableName}} WHERE " +
-           "(:search IS NULL OR " +
+    @Query("SELECT * FROM {{tableName}} u WHERE " +
+           "(:search IS NULL OR :search = '' OR " +
            "{{searchQuery}}) " +
+           "ORDER BY u.created_at DESC " +
            "LIMIT :limit OFFSET :offset")
     Flux<{{entityName}}Dbo> findBySearchTerm(@Param("search") String search, 
                                              @Param("limit") Long limit, 
@@ -45,15 +46,15 @@ public interface {{classname}} extends R2dbcRepository<{{entityName}}Dbo, UUID> 
     /**
      * Count entities matching search term.
      */
-    @Query("SELECT COUNT(*) FROM {{tableName}} WHERE " +
-           "(:search IS NULL OR " +
+    @Query("SELECT COUNT(*) FROM {{tableName}} u WHERE " +
+           "(:search IS NULL OR :search = '' OR " +
            "{{searchQuery}})")
     Mono<Long> countBySearchTerm(@Param("search") String search);
     
     /**
      * Find all entities with pagination.
      */
-    @Query("SELECT * FROM {{tableName}} LIMIT :limit OFFSET :offset")
+    @Query("SELECT * FROM {{tableName}} u ORDER BY u.created_at DESC LIMIT :limit OFFSET :offset")
     Flux<{{entityName}}Dbo> findAllPaged(@Param("limit") Long limit, @Param("offset") Long offset);
 }
 {{/isJpaRepository}}

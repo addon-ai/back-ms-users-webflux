@@ -66,7 +66,7 @@ public class {{classname}} implements {{operationName}}UseCase {
     {{/isUpdate}}
     {{^isUpdate}}
     @Override
-    public Mono<{{returnType}}> execute({{requestType}} request) {
+    public Mono<{{returnType}}> execute({{#isListOperation}}{{requestType}} request{{/isListOperation}}{{^isListOperation}}{{requestType}} request{{/isListOperation}}) {
         logger.info("Executing {{operationName}} with request: {}", request);
         
         {{#isCreate}}
@@ -114,8 +114,41 @@ public class {{classname}} implements {{operationName}}UseCase {
                 .doOnError(NotFoundException.class, e -> logger.error("{{entityName}} not found in {{operationName}}", e, request))
                 .doOnError(Exception.class, e -> logger.error("Error in {{operationName}}", e, request));
         {{/isDelete}}
-        {{^isCreate}}{{^isGet}}{{^isDelete}}
-        // List operation
+        {{#isListOperation}}
+        // List operation with pagination
+        Integer page = request.getPage() != null ? request.getPage().intValue() : 1;
+        Integer size = request.getSize() != null ? request.getSize().intValue() : 20;
+        String search = request.getSearch();
+        
+        int pageNum = page != null && page > 0 ? page : 1;
+        int pageSize = size != null && size > 0 ? size : 20;
+        long limit = pageSize;
+        long offset = (pageNum - 1) * pageSize;
+        
+        Mono<Long> totalCountMono;
+        Flux<{{entityName}}> entityFlux;
+        
+        if (search != null && !search.trim().isEmpty()) {
+            totalCountMono = (({{entityName}}RepositoryAdapter) {{entityVarName}}RepositoryPort).countBySearchTerm(search);
+            entityFlux = {{entityVarName}}RepositoryPort.findBySearchTerm(search, pageNum, pageSize);
+        } else {
+            totalCountMono = Mono.just(0L); // Will be replaced with actual count
+            entityFlux = {{entityVarName}}RepositoryPort.findAll();
+        }
+        
+        return Mono.zip(
+            entityFlux.collectList(),
+            totalCountMono
+        ).map(tuple -> {
+            List<{{entityName}}> entities = tuple.getT1();
+            Long totalCount = tuple.getT2();
+            
+            logger.info("Retrieved {} {{entityVarName}}s successfully (total: {})", entities.size(), totalCount);
+            return ({{returnType}}) {{entityVarName}}Mapper.toListResponse(entities, pageNum, pageSize, totalCount.intValue());
+        }).doOnError(e -> logger.error("Error in {{operationName}}", e));
+        {{/isListOperation}}
+        {{^isListOperation}}
+        // Simple operation
         return {{entityVarName}}RepositoryPort.findAll()
                 .collectList()
                 .map({{entityVarName}}s -> {
@@ -123,7 +156,7 @@ public class {{classname}} implements {{operationName}}UseCase {
                     return ({{returnType}}) {{entityVarName}}Mapper.toListResponse({{entityVarName}}s);
                 })
                 .doOnError(Exception.class, e -> logger.error("Error in {{operationName}}", e, request));
-        {{/isDelete}}{{/isGet}}{{/isCreate}}
+        {{/isListOperation}}
     }
     {{/isUpdate}}
 }

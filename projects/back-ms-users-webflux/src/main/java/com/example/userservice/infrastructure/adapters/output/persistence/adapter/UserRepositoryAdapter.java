@@ -98,11 +98,28 @@ public class UserRepositoryAdapter implements UserRepositoryPort {
                 .onErrorMap(e -> new InternalServerErrorException("Failed to search Users", e));
     }
     
-    // Additional business methods for reactive operations
+    @Override
+    public Mono<Long> countAll() {
+        log.debug("Counting all Users");
+        return r2dbcRepository.countAll()
+                .doOnError(e -> log.error("Database error while counting all Users: {}", e.getMessage(), e))
+                .onErrorMap(e -> new InternalServerErrorException("Failed to count all Users", e));
+    }
+    
+    @Override
     public Mono<Long> countBySearchTerm(String search) {
         log.debug("Counting Users with search term: {}", search);
         return r2dbcRepository.countBySearchTerm(search)
                 .doOnError(e -> log.error("Database error while counting Users: {}", e.getMessage(), e))
                 .onErrorMap(e -> new InternalServerErrorException("Failed to count Users", e));
+    }
+    
+    @Override
+    public Flux<User> findAllPaged(Long limit, Long offset) {
+        log.debug("Finding all Users with pagination: limit={}, offset={}", limit, offset);
+        return r2dbcRepository.findAllPaged(limit, offset)
+                .map(mapper::toDomain)
+                .doOnError(e -> log.error("Database error while finding paged Users: {}", e.getMessage(), e))
+                .onErrorMap(e -> new InternalServerErrorException("Failed to find paged Users", e));
     }
 }

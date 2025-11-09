@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
          http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
+    
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>3.2.5</version>
     </parent>
-
+    
     <groupId>com.example</groupId>
     <artifactId>user-service-webflux</artifactId>
     <version>1.0.0</version>
-
+    
     <properties>
         <java.version>21</java.version>
         <spring-boot.version>3.2.5</spring-boot.version>
@@ -27,10 +27,10 @@
         <springdoc-webflux.version>2.1.0</springdoc-webflux.version>
         <reactor-test.version>3.6.5</reactor-test.version>
         <postgresql.version>42.7.3</postgresql.version>
-
-
-
-
+        
+        
+        
+        
         <maven-compiler.version>3.11.0</maven-compiler.version>
         <maven-surefire.version>3.2.5</maven-surefire.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
@@ -39,7 +39,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
-
+    
     <distributionManagement>
         <repository>
             <id>github</id>
@@ -47,7 +47,7 @@
             <url>https://maven.pkg.github.com/addon-ai/back-ms-users-webflux</url>
         </repository>
     </distributionManagement>
-
+    
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -106,7 +106,8 @@
             <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
             <version>${springdoc-webflux.version}</version>
         </dependency>
-
+        
+        <!-- Test Dependencies -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -129,7 +130,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
+    
     <build>
         <plugins>
             <plugin>
@@ -144,7 +145,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -170,7 +170,7 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
-
+                    
                     <compilerArgs>
                         <compilerArg>
                             -Amapstruct.defaultComponentModel=spring

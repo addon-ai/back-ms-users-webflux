@@ -85,10 +85,10 @@ public interface UserMapper {
     
     // Delete response method - available when delete DTO exists
     default DeleteUserResponseContent toDeleteResponse(User domain) {
-        DeleteUserResponseContent response = new DeleteUserResponseContent();
-        response.setMessage("User deleted successfully");
-        response.setDeleted(true);
-        return response;
+        return DeleteUserResponseContent.builder()
+            .deleted(true)
+            .message("User deleted successfully")
+            .build();
     }
     
     // Pagination support for list responses with proper total count
@@ -97,13 +97,13 @@ public interface UserMapper {
         
         int totalPages = (int) Math.ceil((double) totalCount / size);
         
-        ListUsersResponseContent response = new ListUsersResponseContent();
-        response.setUsers(toDtoList(domains));
-        response.setPage(java.math.BigDecimal.valueOf(page));
-        response.setSize(java.math.BigDecimal.valueOf(size));
-        response.setTotal(java.math.BigDecimal.valueOf(totalCount));
-        response.setTotalPages(java.math.BigDecimal.valueOf(totalPages));
-        return response;
+        return ListUsersResponseContent.builder()
+            .users(toDtoList(domains))
+            .page(java.math.BigDecimal.valueOf(page))
+            .size(java.math.BigDecimal.valueOf(size))
+            .total(java.math.BigDecimal.valueOf(totalCount))
+            .totalPages(java.math.BigDecimal.valueOf(totalPages))
+            .build();
     }
     
     // Overloaded method for backward compatibility

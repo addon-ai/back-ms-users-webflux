@@ -1,18 +1,15 @@
 #!/usr/bin/env python3
 """
-Backstage Golden Path Generator
-Converts generated Java projects into Backstage Software Templates (Golden Paths)
+Backstage Files Generator
+Generates template.yaml and catalog-info.yaml for each project
 """
-import os
-import re
-import shutil
 import json
 from pathlib import Path
 import pystache
 
 
-class BackstageGoldenPathGenerator:
-    """Generates Backstage Golden Paths from Java projects."""
+class BackstageFilesGenerator:
+    """Generates Backstage files for Java projects."""
     
     def __init__(self, config_path: str):
         """Initialize with configuration."""
@@ -20,68 +17,33 @@ class BackstageGoldenPathGenerator:
             self.projects = json.load(f)
         self.templates_dir = Path(__file__).parent / 'templates'
     
-    def generate_all(self, projects_dir: str, output_dir: str):
-        """Generate Golden Paths for all projects."""
+    def generate_all(self, projects_dir: str):
+        """Generate Backstage files for all projects."""
         projects_path = Path(projects_dir)
-        output_path = Path(output_dir)
-        output_path.mkdir(parents=True, exist_ok=True)
-        
-        # Track which templates we've already generated
-        generated_templates = set()
-        template_info = []
         
         for project_config in self.projects:
             project_name = project_config['project']['general']['name']
-            source_project = projects_path / project_name
+            project_path = projects_path / project_name
             
-            if not source_project.exists():
+            if not project_path.exists():
                 print(f"⚠️  Project {project_name} not found, skipping...")
                 continue
             
-            # Determine stack type
-            stack_type = 'webflux' if 'webflux' in project_name.lower() else 'springboot'
-            template_name = f"{stack_type}-service"
-            
-            # Skip if we already generated this template type
-            if template_name in generated_templates:
-                print(f"⏭️  Skipping {project_name} - {template_name} already generated")
-                continue
-            
-            print(f"📦 Generating Golden Path for {project_name} ({stack_type})...")
-            template_data = self.generate_golden_path(source_project, output_path / template_name, project_config, stack_type)
-            generated_templates.add(template_name)
-            template_info.append(template_data)
-        
-        # Generate root catalog-info.yaml for importing all templates
-        if template_info:
-            self._generate_root_catalog(output_path, template_info)
+            print(f"📦 Generating Backstage files for {project_name}...")
+            self.generate_backstage_files(project_path, project_config)
     
-    def generate_golden_path(self, source_project: Path, output_path: Path, project_config: dict, stack_type: str):
-        """Generate a single Golden Path."""
-        # 1. Create skeleton directory (exclude .java and .sql files)
-        skeleton_path = output_path / 'skeleton'
-        if skeleton_path.exists():
-            shutil.rmtree(skeleton_path)
-        
-        def ignore_files(dir, files):
-            return [f for f in files if f.endswith(('.java', '.sql'))]
-        
-        shutil.copytree(source_project, skeleton_path, ignore=ignore_files)
-        
-        # 2. Re-parametrize skeleton
+    def generate_backstage_files(self, project_path: Path, project_config: dict):
+        """Generate template.yaml and catalog-info.yaml in project directory."""
         project_info = project_config['project']
         project_name = project_info['general']['name']
-        hardcoded_artifact = project_info['params']['artifactId']
-        hardcoded_group = project_info['params']['configOptions']['basePackage']
-        
-        self._reparametrize_skeleton(skeleton_path, project_name, hardcoded_artifact, hardcoded_group)
-        
-        # 3. Generate template.yaml
+        stack_type = 'webflux' if 'webflux' in project_name.lower() else 'springboot'
         github_org = project_config.get('devops', {}).get('github', {}).get('organization', 'your-org')
+        
+        # Generate template.yaml
         template_vars = {
-            'template_id': f"{stack_type}-service-template",
-            'template_title': f"Java {stack_type.title()} Service",
-            'template_description': f"Create a new Java {stack_type.title()} microservice with hexagonal architecture",
+            'template_id': f"{project_name}-template",
+            'template_title': project_info['general']['description'],
+            'template_description': project_info['general']['description'],
             'stack_type': stack_type,
             'default_owner': 'platform-team',
             'default_groupId': project_info['params']['groupId'],
@@ -89,95 +51,16 @@ class BackstageGoldenPathGenerator:
             'github_org': github_org
         }
         
-        self._render_template('template.yaml.mustache', output_path / 'template.yaml', template_vars)
+        self._render_template('template.yaml.mustache', project_path / 'template.yaml', template_vars)
         
-        # 4. Generate catalog-info.yaml for skeleton
+        # Generate catalog-info.yaml
         catalog_vars = {
             'system_name': 'backend-services'
         }
         
-        self._render_template('catalog-info.yaml.mustache', skeleton_path / 'catalog-info.yaml', catalog_vars)
+        self._render_template('catalog-info.yaml.mustache', project_path / 'catalog-info.yaml', catalog_vars)
         
-        print(f"✅ Golden Path created at {output_path}")
-        
-        return {
-            'template_id': template_vars['template_id'],
-            'template_title': template_vars['template_title'],
-            'template_folder': output_path.name
-        }
-    
-    def _reparametrize_skeleton(self, skeleton_path: Path, project_name: str, hardcoded_artifact: str, hardcoded_group: str):
-        """Replace hardcoded values with Backstage template variables."""
-        
-        # Patterns to replace
-        replacements = {
-            # Maven/Gradle artifacts
-            f'<artifactId>{hardcoded_artifact}</artifactId>': '<artifactId>${{ values.component_id }}</artifactId>',
-            f'<groupId>{hardcoded_group}</groupId>': '<groupId>${{ values.groupId }}</groupId>',
-            f'<name>{hardcoded_artifact}</name>': '<name>${{ values.component_id }}</name>',
-            
-            # Application properties (YAML)
-            f'name: {project_name}': 'name: ${{ values.component_id }}',
-            
-            # Application properties (properties file)
-            f'spring.application.name={hardcoded_artifact}': 'spring.application.name=${{ values.component_id }}',
-            f'spring.application.name={project_name}': 'spring.application.name=${{ values.component_id }}',
-            
-            # Java packages
-            f'package {hardcoded_group}': 'package ${{ values.java_package_name }}',
-            f'import {hardcoded_group}': 'import ${{ values.java_package_name }}',
-        }
-        
-        # Process all text files
-        for root, dirs, files in os.walk(skeleton_path):
-            # Skip .git and target directories
-            dirs[:] = [d for d in dirs if d not in ['.git', 'target', 'node_modules', '.idea']]
-            
-            for file in files:
-                if file.endswith(('.java', '.xml', '.properties', '.yml', '.yaml', '.md')):
-                    file_path = Path(root) / file
-                    try:
-                        content = file_path.read_text(encoding='utf-8')
-                        
-                        # Apply replacements
-                        for old, new in replacements.items():
-                            content = content.replace(old, new)
-                        
-                        file_path.write_text(content, encoding='utf-8')
-                    except Exception as e:
-                        print(f"⚠️  Could not process {file_path}: {e}")
-        
-        # Rename package directories
-        self._rename_package_dirs(skeleton_path, hardcoded_group)
-    
-    def _rename_package_dirs(self, skeleton_path: Path, hardcoded_group: str):
-        """Rename Java package directories to template variables."""
-        src_main_java = skeleton_path / 'src' / 'main' / 'java'
-        src_test_java = skeleton_path / 'src' / 'test' / 'java'
-        
-        for base_path in [src_main_java, src_test_java]:
-            if not base_path.exists():
-                continue
-            
-            # Find the package root (e.g., com/example/userservice)
-            package_path = base_path / hardcoded_group.replace('.', '/')
-            if package_path.exists():
-                # Create placeholder directory structure
-                placeholder_path = base_path / '${{ values.java_package_path }}'
-                placeholder_path.parent.mkdir(parents=True, exist_ok=True)
-                
-                # Move contents
-                if placeholder_path.exists():
-                    shutil.rmtree(placeholder_path)
-                shutil.move(str(package_path), str(placeholder_path))
-                
-                # Clean up old package structure
-                old_root = base_path / hardcoded_group.split('.')[0]
-                if old_root.exists() and old_root != placeholder_path:
-                    try:
-                        shutil.rmtree(old_root)
-                    except:
-                        pass
+        print(f"✅ Backstage files created in {project_path}")
     
     def _render_template(self, template_name: str, output_path: Path, context: dict):
         """Render a Mustache template."""
@@ -185,56 +68,26 @@ class BackstageGoldenPathGenerator:
         template_content = template_path.read_text(encoding='utf-8')
         rendered = pystache.render(template_content, context)
         output_path.write_text(rendered, encoding='utf-8')
-    
-    def _generate_root_catalog(self, output_path: Path, template_info: list):
-        """Generate catalog-info.yaml as Component kind."""
-        github_org = self.projects[0].get('devops', {}).get('github', {}).get('organization', 'your-org')
-        
-        catalog_content = [
-            "apiVersion: backstage.io/v1alpha1",
-            "kind: Component",
-            "metadata:",
-            "  name: hexagonal-architecture-templates",
-            "  description: |",
-            "    Spring Boot service templates with Hexagonal Architecture (Ports and Adapters).",
-            "    Includes both traditional Spring Boot and reactive WebFlux implementations.",
-            "  links:",
-            "    - title: Documentation",
-            f"      url: https://github.com/{github_org}/backstage-templates/blob/main/README.md",
-            "  annotations:",
-            f"    github.com/project-slug: {github_org}/backstage-templates",
-            "spec:",
-            "  type: template-collection",
-            "  owner: platform-team",
-            "  lifecycle: production"
-        ]
-        
-        catalog_file = output_path / 'catalog-info.yaml'
-        catalog_file.write_text('\n'.join(catalog_content), encoding='utf-8')
-        
-        print(f"\n📋 Catalog generated: {catalog_file}")
 
 
 def main():
     """Main entry point."""
     import sys
     
-    if len(sys.argv) < 4:
-        print("Usage: python main.py <config_path> <projects_dir> <output_dir>")
+    if len(sys.argv) < 3:
+        print("Usage: python main.py <config_path> <projects_dir>")
         sys.exit(1)
     
     config_path = sys.argv[1]
     projects_dir = sys.argv[2]
-    output_dir = sys.argv[3]
     
-    generator = BackstageGoldenPathGenerator(config_path)
-    generator.generate_all(projects_dir, output_dir)
+    generator = BackstageFilesGenerator(config_path)
+    generator.generate_all(projects_dir)
     
-    print("\n✅ All Golden Paths generated successfully!")
-    print("\n📖 Next steps:")
-    print("   1. Push backstage-templates/ to GitHub")
-    print("   2. Add URLs to app-config.yaml (see catalog-info.yaml)")
-    print(f"   3. Instructions: {Path(output_dir).absolute()}/IMPORT_INSTRUCTIONS.md")
+    print("\n✅ Backstage files generated in all projects!")
+    print("\n📚 Files created:")
+    print("   • template.yaml - Backstage template definition")
+    print("   • catalog-info.yaml - Backstage catalog entry")
 
 
 if __name__ == '__main__':

@@ -161,6 +161,16 @@ fi
 
 echo ""
 echo ""
+echo "🎯 Step 8: Generating Backstage Golden Paths..."
+echo ""
+
+# Generate Backstage templates from generated projects
+python3 "$PROJECT_ROOT/libs/py-backstage-goldenpath-gen/main.py" \
+    "$CONFIG_PATH" \
+    "$PROJECT_ROOT/projects" \
+    "$PROJECT_ROOT/backstage-templates"
+
+echo ""
 echo "💾 Committing pipeline changes..."
 echo ""
 
@@ -177,8 +187,10 @@ echo "   • docs/puml/open-api/ → OpenAPI documentation (PlantUML, Markdown, 
 echo "   • docs/puml/components/ → Architectural component diagrams (PlantUML)"
 echo "   • docs/puml/sequences/ → CRUD sequence diagrams by service (PlantUML)"
 echo "   • sql/ → SQL DDL scripts for database creation"
+echo "   • backstage-templates/ → Backstage Golden Path templates ready to register"
 echo "   • GitHub repositories → Synchronized with generated projects (if GITHUB_TOKEN set)"
 echo "🌿 Pipeline branch: $(git branch --show-current)"
 echo "🚀 Ready to run:"
 echo "   • Spring Boot: cd projects/[project-name] && mvn spring-boot:run"
 echo "   • Spring WebFlux: cd projects/[project-name] && mvn spring-boot:run"
+echo "   • Backstage: Register templates from backstage-templates/ in your Backstage instance"

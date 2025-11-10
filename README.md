@@ -46,6 +46,13 @@ This project generates complete Java Spring Boot applications following **Hexago
 - ✅ **Smart Commits** - Commits changes with Smithy repository names in message
 - ✅ **Configurable Settings** - Branch naming and limits configurable via JSON
 
+### Backstage Integration (Golden Paths)
+- ✅ **Software Templates** - Generates Backstage Scaffolder templates from Java projects
+- ✅ **Self-Service Platform** - Developers create services via Backstage UI
+- ✅ **Automatic Re-Parametrization** - Converts hardcoded values to template variables
+- ✅ **Skeleton Generation** - Creates ready-to-use project templates
+- ✅ **Platform Engineering** - Complete IDP (Internal Developer Platform) integration
+
 ## Quick Start
 
 ### 1. Install Dependencies
@@ -185,6 +192,17 @@ boiler-plate-code-gen/
 ```
 
 ## Libraries Documentation
+
+### Platform Engineering
+
+#### `py-backstage-goldenpath-gen/`
+**Purpose**: Generates Backstage Software Templates (Golden Paths) from Java projects
+- **Input**: Generated Java projects from `projects/`
+- **Output**: Backstage templates in `backstage-templates/`
+- **Process**: Re-parametrizes hardcoded values to Backstage variables
+- **Templates**: Creates `template.yaml` and `catalog-info.yaml`
+- **Integration**: Complete self-service platform for developers
+- **Documentation**: See [BACKSTAGE_INTEGRATION.md](BACKSTAGE_INTEGRATION.md)
 
 ### Core Libraries
 
@@ -441,6 +459,7 @@ Each pipeline execution:
 - **Projects**: Complete Spring Boot applications in `projects/`
 - **Documentation**: PlantUML diagrams in `docs/puml/`
 - **Schemas**: JSON schemas and fake data in `schemas/`
+- **Backstage Templates**: Golden Paths in `backstage-templates/`
 - **GitHub Repos**: Private repositories with CI/CD workflows
 - **Git History**: Preserved across regenerations
 

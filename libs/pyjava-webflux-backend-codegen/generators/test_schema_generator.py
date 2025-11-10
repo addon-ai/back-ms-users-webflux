@@ -79,8 +79,8 @@ class TestSchemaGenerator:
         if not columns:
             columns = [
                 {'name': 'status', 'type': 'VARCHAR(255)', 'constraints': ' NOT NULL'},
-                {'name': 'created_at', 'type': 'TIMESTAMP', 'constraints': ' NOT NULL DEFAULT CURRENT_TIMESTAMP'},
-                {'name': 'updated_at', 'type': 'TIMESTAMP', 'constraints': ' NOT NULL DEFAULT CURRENT_TIMESTAMP'}
+                {'name': 'created_at', 'type': 'TIMESTAMP', 'constraints': ''},
+                {'name': 'updated_at', 'type': 'TIMESTAMP', 'constraints': ''}
             ]
         
         return columns
@@ -109,14 +109,9 @@ class TestSchemaGenerator:
         """Build SQL constraints for column."""
         constraints = []
         
-        if prop_name in required:
+        # Skip NOT NULL for timestamp fields (createdAt, updatedAt)
+        if prop_name in required and prop_name not in ['createdAt', 'updatedAt', 'created_at', 'updated_at']:
             constraints.append('NOT NULL')
-        
-        # Add defaults for common fields
-        if prop_name in ['createdAt', 'created_at']:
-            constraints.append('DEFAULT CURRENT_TIMESTAMP')
-        elif prop_name in ['updatedAt', 'updated_at']:
-            constraints.append('DEFAULT CURRENT_TIMESTAMP')
         
         return ' ' + ' '.join(constraints) if constraints else ''
     

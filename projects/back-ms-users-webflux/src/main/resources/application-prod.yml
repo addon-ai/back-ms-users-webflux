@@ -1,6 +1,4 @@
 spring:
-  profiles:
-    active: prod
   r2dbc:
     url: ${DB_URL}
     username: ${DB_USERNAME}
@@ -19,7 +17,7 @@ server:
 
 logging:
   level:
-    : ${LOG_LEVEL:INFO}
+    root: ${LOG_LEVEL:INFO}
     org.springframework.security: ${SECURITY_LOG_LEVEL:WARN}
 
 springdoc:

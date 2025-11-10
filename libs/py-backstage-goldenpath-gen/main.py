@@ -73,14 +73,16 @@ class BackstageGoldenPathGenerator:
         self._reparametrize_skeleton(skeleton_path, project_name, hardcoded_artifact, hardcoded_group)
         
         # 3. Generate template.yaml
+        github_org = project_config.get('devops', {}).get('github', {}).get('organization', 'your-org')
         template_vars = {
             'template_id': f"{stack_type}-service-template",
             'template_title': f"Java {stack_type.title()} Service",
             'template_description': f"Create a new Java {stack_type.title()} microservice with hexagonal architecture",
             'stack_type': stack_type,
             'default_owner': 'platform-team',
-            'default_groupId': 'com.example',
-            'default_javaVersion': project_config.get('devops', {}).get('ci', {}).get('javaVersion', '21')
+            'default_groupId': project_info['params']['groupId'],
+            'default_javaVersion': project_config.get('devops', {}).get('ci', {}).get('javaVersion', '21'),
+            'github_org': github_org
         }
         
         self._render_template('template.yaml.mustache', output_path / 'template.yaml', template_vars)

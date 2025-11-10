@@ -66,6 +66,8 @@ spec:
           ui:options:
             allowedHosts:
               - github.com
+            allowedOwners:
+              - {{github_org}}
 
   steps:
     - id: fetch
@@ -74,21 +76,21 @@ spec:
       input:
         url: ./skeleton
         values:
-          component_id: ${{ '{{' }} parameters.component_id {{ '}}' }}
-          description: ${{ '{{' }} parameters.description {{ '}}' }}
-          owner: ${{ '{{' }} parameters.owner {{ '}}' }}
-          groupId: ${{ '{{' }} parameters.groupId {{ '}}' }}
-          javaVersion: ${{ '{{' }} parameters.javaVersion {{ '}}' }}
-          java_package_path: ${{ '{{' }} parameters.groupId | replace(".", "/") {{ '}}' }}/${{ '{{' }} parameters.component_id | replace("-", "") {{ '}}' }}
-          java_package_name: ${{ '{{' }} parameters.groupId {{ '}}' }}.${{ '{{' }} parameters.component_id | replace("-", "") {{ '}}' }}
+          component_id: {{=<% %>=}}${{ parameters.component_id }}<%={{ }}=%>
+          description: {{=<% %>=}}${{ parameters.description }}<%={{ }}=%>
+          owner: {{=<% %>=}}${{ parameters.owner }}<%={{ }}=%>
+          groupId: {{=<% %>=}}${{ parameters.groupId }}<%={{ }}=%>
+          javaVersion: {{=<% %>=}}${{ parameters.javaVersion }}<%={{ }}=%>
+          java_package_path: {{=<% %>=}}${{ (parameters.groupId | replace(".", "/")) + "/" + (parameters.component_id | replace("-", "")) }}<%={{ }}=%>
+          java_package_name: {{=<% %>=}}${{ parameters.groupId + "." + (parameters.component_id | replace("-", "")) }}<%={{ }}=%>
 
     - id: publish
       name: Publish to GitHub
       action: publish:github
       input:
         allowedHosts: ['github.com']
-        description: ${{ '{{' }} parameters.description {{ '}}' }}
-        repoUrl: ${{ '{{' }} parameters.repoUrl {{ '}}' }}
+        description: {{=<% %>=}}${{ parameters.description }}<%={{ }}=%>
+        repoUrl: {{=<% %>=}}${{ parameters.repoUrl }}<%={{ }}=%>
         repoVisibility: private
         defaultBranch: main
 
@@ -96,13 +98,13 @@ spec:
       name: Register Component
       action: catalog:register
       input:
-        repoContentsUrl: ${{ '{{' }} steps.publish.output.repoContentsUrl {{ '}}' }}
+        repoContentsUrl: {{=<% %>=}}${{ steps.publish.output.repoContentsUrl }}<%={{ }}=%>
         catalogInfoPath: '/catalog-info.yaml'
 
   output:
     links:
       - title: Repository
-        url: ${{ '{{' }} steps.publish.output.remoteUrl {{ '}}' }}
+        url: {{=<% %>=}}${{ steps.publish.output.remoteUrl }}<%={{ }}=%>
       - title: Open in catalog
         icon: catalog
-        entityRef: ${{ '{{' }} steps.register.output.entityRef {{ '}}' }}
+        entityRef: {{=<% %>=}}${{ steps.register.output.entityRef }}<%={{ }}=%>

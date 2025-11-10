@@ -5,12 +5,12 @@ import {{basePackage}}.infrastructure.adapters.output.persistence.repository.Jpa
 import {{basePackage}}.domain.model.EntityStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
+import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
-import java.util.Optional;
+import java.util.UUID;
+import java.time.Duration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,12 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author {{author}}
  * @version {{version}}
  */
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@DataR2dbcTest
 class Jpa{{entityName}}RepositoryTest {
-
-    @Autowired
-    private TestEntityManager entityManager;
 
     @Autowired
     private Jpa{{entityName}}Repository {{entityVarName}}Repository;
@@ -65,14 +61,16 @@ class Jpa{{entityName}}RepositoryTest {
     void findById_ShouldReturnEntity_WhenExists() {
         // Given
         {{entityName}}Dbo {{entityVarName}} = create{{entityName}}Dbo();
-        {{entityName}}Dbo saved{{entityName}} = entityManager.persistAndFlush({{entityVarName}});
+        {{entityName}}Dbo saved{{entityName}} = {{entityVarName}}Repository.save({{entityVarName}})
+            .block(Duration.ofSeconds(5));
 
         // When
-        Optional<{{entityName}}Dbo> result = {{entityVarName}}Repository.findById(saved{{entityName}}.getId());
+        {{entityName}}Dbo result = {{entityVarName}}Repository.findById(saved{{entityName}}.getId())
+            .block(Duration.ofSeconds(5));
 
         // Then
-        assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(saved{{entityName}}.getId());
+        assertThat(result).isNotNull();
+        assertThat(result.getId()).isEqualTo(saved{{entityName}}.getId());
     }
 
     @Test
@@ -81,12 +79,14 @@ class Jpa{{entityName}}RepositoryTest {
         {{entityName}}Dbo {{entityVarName}} = create{{entityName}}Dbo();
 
         // When
-        {{entityName}}Dbo saved{{entityName}} = {{entityVarName}}Repository.save({{entityVarName}});
+        {{entityName}}Dbo saved{{entityName}} = {{entityVarName}}Repository.save({{entityVarName}})
+            .block(Duration.ofSeconds(5));
 
         // Then
         assertThat(saved{{entityName}}.getId()).isNotNull();
         
-        {{entityName}}Dbo found{{entityName}} = entityManager.find({{entityName}}Dbo.class, saved{{entityName}}.getId());
+        {{entityName}}Dbo found{{entityName}} = {{entityVarName}}Repository.findById(saved{{entityName}}.getId())
+            .block(Duration.ofSeconds(5));
         assertThat(found{{entityName}}).isNotNull();
     }
 
@@ -94,14 +94,16 @@ class Jpa{{entityName}}RepositoryTest {
     void deleteById_ShouldRemoveEntity() {
         // Given
         {{entityName}}Dbo {{entityVarName}} = create{{entityName}}Dbo();
-        {{entityName}}Dbo saved{{entityName}} = entityManager.persistAndFlush({{entityVarName}});
+        {{entityName}}Dbo saved{{entityName}} = {{entityVarName}}Repository.save({{entityVarName}})
+            .block(Duration.ofSeconds(5));
 
         // When
-        {{entityVarName}}Repository.deleteById(saved{{entityName}}.getId());
-        entityManager.flush();
+        {{entityVarName}}Repository.deleteById(saved{{entityName}}.getId())
+            .block(Duration.ofSeconds(5));
 
         // Then
-        {{entityName}}Dbo found{{entityName}} = entityManager.find({{entityName}}Dbo.class, saved{{entityName}}.getId());
+        {{entityName}}Dbo found{{entityName}} = {{entityVarName}}Repository.findById(saved{{entityName}}.getId())
+            .block(Duration.ofSeconds(5));
         assertThat(found{{entityName}}).isNull();
     }
 
@@ -109,10 +111,12 @@ class Jpa{{entityName}}RepositoryTest {
     void existsById_ShouldReturnTrue_WhenEntityExists() {
         // Given
         {{entityName}}Dbo {{entityVarName}} = create{{entityName}}Dbo();
-        {{entityName}}Dbo saved{{entityName}} = entityManager.persistAndFlush({{entityVarName}});
+        {{entityName}}Dbo saved{{entityName}} = {{entityVarName}}Repository.save({{entityVarName}})
+            .block(Duration.ofSeconds(5));
 
         // When
-        boolean exists = {{entityVarName}}Repository.existsById(saved{{entityName}}.getId());
+        Boolean exists = {{entityVarName}}Repository.existsById(saved{{entityName}}.getId())
+            .block(Duration.ofSeconds(5));
 
         // Then
         assertThat(exists).isTrue();
@@ -120,8 +124,12 @@ class Jpa{{entityName}}RepositoryTest {
 
     @Test
     void existsById_ShouldReturnFalse_WhenEntityDoesNotExist() {
+        // Given
+        UUID nonExistentId = UUID.randomUUID();
+        
         // When
-        boolean exists = {{entityVarName}}Repository.existsById("non-existent-id");
+        Boolean exists = {{entityVarName}}Repository.existsById(nonExistentId)
+            .block(Duration.ofSeconds(5));
 
         // Then
         assertThat(exists).isFalse();

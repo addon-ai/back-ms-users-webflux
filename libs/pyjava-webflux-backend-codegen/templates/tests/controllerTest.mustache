@@ -11,6 +11,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import reactor.core.publisher.Mono;
+
+import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,10 +61,11 @@ class {{classname}}Test {
             .build();
         
         when({{entityVarName}}UseCase.create(any(Create{{entityName}}RequestContent.class)))
-            .thenReturn(response);
+            .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<Create{{entityName}}ResponseContent> result = {{entityVarName}}Controller.create{{entityName}}(request, "test-request-id", null, null);
+        ResponseEntity<Create{{entityName}}ResponseContent> result = {{entityVarName}}Controller.create{{entityName}}(request, "test-request-id", null, null)
+            .block(Duration.ofSeconds(5));
 
         // Then
         assertEquals(HttpStatus.CREATED, result.getStatusCode());
@@ -78,10 +82,11 @@ class {{classname}}Test {
             .build();
         
         when({{entityVarName}}UseCase.get(anyString()))
-            .thenReturn(response);
+            .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<Get{{entityName}}ResponseContent> result = {{entityVarName}}Controller.get{{entityName}}({{entityVarName}}Id, "test-request-id", null, null);
+        ResponseEntity<Get{{entityName}}ResponseContent> result = {{entityVarName}}Controller.get{{entityName}}({{entityVarName}}Id, "test-request-id", null, null)
+            .block(Duration.ofSeconds(5));
 
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -114,10 +119,11 @@ class {{classname}}Test {
             .build();
         
         when({{entityVarName}}UseCase.update(anyString(), any(Update{{entityName}}RequestContent.class)))
-            .thenReturn(response);
+            .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<Update{{entityName}}ResponseContent> result = {{entityVarName}}Controller.update{{entityName}}({{entityVarName}}Id, request, "test-request-id", null, null);
+        ResponseEntity<Update{{entityName}}ResponseContent> result = {{entityVarName}}Controller.update{{entityName}}({{entityVarName}}Id, request, "test-request-id", null, null)
+            .block(Duration.ofSeconds(5));
 
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -136,10 +142,11 @@ class {{classname}}Test {
             .build();
         
         when({{entityVarName}}UseCase.delete(anyString()))
-            .thenReturn(response);
+            .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<Delete{{entityName}}ResponseContent> result = {{entityVarName}}Controller.delete{{entityName}}({{entityVarName}}Id, "test-request-id", null, null);
+        ResponseEntity<Delete{{entityName}}ResponseContent> result = {{entityVarName}}Controller.delete{{entityName}}({{entityVarName}}Id, "test-request-id", null, null)
+            .block(Duration.ofSeconds(5));
 
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -154,11 +161,12 @@ class {{classname}}Test {
         List{{entityName}}sResponseContent response = List{{entityName}}sResponseContent.builder()
             .build();
         
-        when({{entityVarName}}UseCase.list(any(), any(), any()))
-            .thenReturn(response);
+        when({{entityVarName}}UseCase.list(any(), any(), any(), any(), any(), any()))
+            .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<List{{entityName}}sResponseContent> result = {{entityVarName}}Controller.list{{entityName}}s(1, 20, null, "test-request-id", null, null);
+        ResponseEntity<List{{entityName}}sResponseContent> result = {{entityVarName}}Controller.list{{entityName}}s(1, 20, null, null, null, null, "test-request-id", null, null)
+            .block(Duration.ofSeconds(5));
 
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());
@@ -173,11 +181,12 @@ class {{classname}}Test {
         {{responseType}} response = {{responseType}}.builder()
             .build();
         
-        when({{entityVarName}}UseCase.{{methodName}}())
-            .thenReturn(response);
+        when({{entityVarName}}UseCase.{{methodName}}({{#pathVariables}}anyString(){{#hasMore}}, {{/hasMore}}{{/pathVariables}}))
+            .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<{{responseType}}> result = {{entityVarName}}Controller.{{methodName}}("test-request-id", null, null);
+        ResponseEntity<{{responseType}}> result = {{entityVarName}}Controller.{{methodName}}({{#pathVariables}}"test-{{name}}"{{#hasMore}}, {{/hasMore}}{{/pathVariables}}{{#pathVariables}}, {{/pathVariables}}"test-request-id", null, null)
+            .block(Duration.ofSeconds(5));
 
         // Then
         assertEquals(HttpStatus.OK, result.getStatusCode());

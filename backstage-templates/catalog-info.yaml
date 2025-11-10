@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: golden-paths-templates
+  description: Golden Path templates for Java microservices
+  annotations:
+    backstage.io/managed-by-location: 'file:catalog-info.yaml'
+spec:
+  type: url
+  targets:
+    - ./springboot-service/template.yaml
+    - ./webflux-service/template.yaml

@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: {{template_id}}-location
+  description: Location for {{template_title}}
+spec:
+  type: url
+  targets:
+    - ./{{template_folder}}/template.yaml

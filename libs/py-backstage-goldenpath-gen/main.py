@@ -28,6 +28,7 @@ class BackstageGoldenPathGenerator:
         
         # Track which templates we've already generated
         generated_templates = set()
+        template_info = []
         
         for project_config in self.projects:
             project_name = project_config['project']['general']['name']
@@ -47,8 +48,13 @@ class BackstageGoldenPathGenerator:
                 continue
             
             print(f"📦 Generating Golden Path for {project_name} ({stack_type})...")
-            self.generate_golden_path(source_project, output_path / template_name, project_config, stack_type)
+            template_data = self.generate_golden_path(source_project, output_path / template_name, project_config, stack_type)
             generated_templates.add(template_name)
+            template_info.append(template_data)
+        
+        # Generate root catalog-info.yaml for importing all templates
+        if template_info:
+            self._generate_root_catalog(output_path, template_info)
     
     def generate_golden_path(self, source_project: Path, output_path: Path, project_config: dict, stack_type: str):
         """Generate a single Golden Path."""
@@ -87,6 +93,12 @@ class BackstageGoldenPathGenerator:
         self._render_template('catalog-info.yaml.mustache', skeleton_path / 'catalog-info.yaml', catalog_vars)
         
         print(f"✅ Golden Path created at {output_path}")
+        
+        return {
+            'template_id': template_vars['template_id'],
+            'template_title': template_vars['template_title'],
+            'template_folder': output_path.name
+        }
     
     def _reparametrize_skeleton(self, skeleton_path: Path, project_name: str, hardcoded_artifact: str, hardcoded_group: str):
         """Replace hardcoded values with Backstage template variables."""
@@ -167,6 +179,30 @@ class BackstageGoldenPathGenerator:
         template_content = template_path.read_text(encoding='utf-8')
         rendered = pystache.render(template_content, context)
         output_path.write_text(rendered, encoding='utf-8')
+    
+    def _generate_root_catalog(self, output_path: Path, template_info: list):
+        """Generate root catalog-info.yaml for importing all templates into Backstage."""
+        catalog_content = [
+            "apiVersion: backstage.io/v1alpha1",
+            "kind: Location",
+            "metadata:",
+            "  name: golden-paths-templates",
+            "  description: Golden Path templates for Java microservices",
+            "  annotations:",
+            "    backstage.io/managed-by-location: 'file:catalog-info.yaml'",
+            "spec:",
+            "  type: url",
+            "  targets:"
+        ]
+        
+        for info in template_info:
+            catalog_content.append(f"    - ./{info['template_folder']}/template.yaml")
+        
+        catalog_file = output_path / 'catalog-info.yaml'
+        catalog_file.write_text('\n'.join(catalog_content), encoding='utf-8')
+        
+        print(f"\n📋 Root catalog created at {catalog_file}")
+        print(f"   Import in Backstage: {catalog_file.absolute()}")
 
 
 def main():
@@ -185,6 +221,10 @@ def main():
     generator.generate_all(projects_dir, output_dir)
     
     print("\n✅ All Golden Paths generated successfully!")
+    print("\n📖 Next steps:")
+    print("   1. Register in Backstage: Import the catalog-info.yaml file")
+    print(f"   2. File location: {Path(output_dir).absolute()}/catalog-info.yaml")
+    print("   3. Or use Backstage UI: Create → Register Existing Component")
 
 
 if __name__ == '__main__':

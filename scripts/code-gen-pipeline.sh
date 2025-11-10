@@ -135,7 +135,7 @@ python3 "$PROJECT_ROOT/libs/py-backstage-goldenpath-gen/main.py" \
     "$PROJECT_ROOT/projects"
 
 echo ""
-echo "🐙 Step 8: Synchronizing projects with GitHub repositories...
+echo "🐙 Step 8: Synchronizing projects with GitHub repositories..."
 echo ""
 
 # Check if any project has GitHub integration enabled

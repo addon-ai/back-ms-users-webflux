@@ -26,6 +26,9 @@ class BackstageGoldenPathGenerator:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
         
+        # Track which templates we've already generated
+        generated_templates = set()
+        
         for project_config in self.projects:
             project_name = project_config['project']['general']['name']
             source_project = projects_path / project_name
@@ -38,8 +41,14 @@ class BackstageGoldenPathGenerator:
             stack_type = 'webflux' if 'webflux' in project_name.lower() else 'springboot'
             template_name = f"{stack_type}-service"
             
+            # Skip if we already generated this template type
+            if template_name in generated_templates:
+                print(f"⏭️  Skipping {project_name} - {template_name} already generated")
+                continue
+            
             print(f"📦 Generating Golden Path for {project_name} ({stack_type})...")
             self.generate_golden_path(source_project, output_path / template_name, project_config, stack_type)
+            generated_templates.add(template_name)
     
     def generate_golden_path(self, source_project: Path, output_path: Path, project_config: dict, stack_type: str):
         """Generate a single Golden Path."""
@@ -51,10 +60,11 @@ class BackstageGoldenPathGenerator:
         
         # 2. Re-parametrize skeleton
         project_info = project_config['project']
-        hardcoded_name = project_info['general']['name']
-        hardcoded_group = project_info['params']['basePackage']
+        project_name = project_info['general']['name']
+        hardcoded_artifact = project_info['params']['artifactId']
+        hardcoded_group = project_info['params']['configOptions']['basePackage']
         
-        self._reparametrize_skeleton(skeleton_path, hardcoded_name, hardcoded_group)
+        self._reparametrize_skeleton(skeleton_path, project_name, hardcoded_artifact, hardcoded_group)
         
         # 3. Generate template.yaml
         template_vars = {
@@ -78,17 +88,22 @@ class BackstageGoldenPathGenerator:
         
         print(f"✅ Golden Path created at {output_path}")
     
-    def _reparametrize_skeleton(self, skeleton_path: Path, hardcoded_name: str, hardcoded_group: str):
+    def _reparametrize_skeleton(self, skeleton_path: Path, project_name: str, hardcoded_artifact: str, hardcoded_group: str):
         """Replace hardcoded values with Backstage template variables."""
+        
         # Patterns to replace
         replacements = {
             # Maven/Gradle artifacts
-            f'<artifactId>{hardcoded_name}</artifactId>': '<artifactId>${{ values.component_id }}</artifactId>',
+            f'<artifactId>{hardcoded_artifact}</artifactId>': '<artifactId>${{ values.component_id }}</artifactId>',
             f'<groupId>{hardcoded_group}</groupId>': '<groupId>${{ values.groupId }}</groupId>',
-            f'<name>{hardcoded_name}</name>': '<name>${{ values.component_id }}</name>',
+            f'<name>{hardcoded_artifact}</name>': '<name>${{ values.component_id }}</name>',
             
-            # Application properties
-            f'spring.application.name={hardcoded_name}': 'spring.application.name=${{ values.component_id }}',
+            # Application properties (YAML)
+            f'name: {project_name}': 'name: ${{ values.component_id }}',
+            
+            # Application properties (properties file)
+            f'spring.application.name={hardcoded_artifact}': 'spring.application.name=${{ values.component_id }}',
+            f'spring.application.name={project_name}': 'spring.application.name=${{ values.component_id }}',
             
             # Java packages
             f'package {hardcoded_group}': 'package ${{ values.java_package_name }}',

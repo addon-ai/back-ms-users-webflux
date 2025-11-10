@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: ${{ values.component_id }}
+  profiles:
+    active: local

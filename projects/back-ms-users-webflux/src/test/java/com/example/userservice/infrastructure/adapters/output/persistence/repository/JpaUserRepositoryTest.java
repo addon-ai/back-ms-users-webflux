@@ -5,7 +5,8 @@ import com.example.userservice.infrastructure.adapters.output.persistence.reposi
 import com.example.userservice.domain.model.EntityStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.data.r2dbc.DataR2dbcTest;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import reactor.test.StepVerifier;
 
 import java.math.BigDecimal;
@@ -20,7 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * @author Jiliar Silgado <jiliar.silgado@gmail.com>
  * @version 1.0.0
  */
-@DataR2dbcTest
+@SpringBootTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class JpaUserRepositoryTest {
 
     @Autowired

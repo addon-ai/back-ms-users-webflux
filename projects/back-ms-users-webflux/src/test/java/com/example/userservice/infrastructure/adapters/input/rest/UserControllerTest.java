@@ -54,12 +54,11 @@ class UserControllerTest {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<CreateUserResponseContent> result = userController.createUser(request, "test-request-id", null, null)
+        CreateUserResponseContent result = userController.createUser(request, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.CREATED, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
     @Test
@@ -73,12 +72,11 @@ class UserControllerTest {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<GetUserResponseContent> result = userController.getUser(userId, "test-request-id", null, null)
+        GetUserResponseContent result = userController.getUser(userId, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
     @Test
@@ -97,12 +95,11 @@ class UserControllerTest {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<UpdateUserResponseContent> result = userController.updateUser(userId, request, "test-request-id", null, null)
+        UpdateUserResponseContent result = userController.updateUser(userId, request, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
     @Test
@@ -118,12 +115,11 @@ class UserControllerTest {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<DeleteUserResponseContent> result = userController.deleteUser(userId, "test-request-id", null, null)
+        DeleteUserResponseContent result = userController.deleteUser(userId, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
     @Test
@@ -136,12 +132,11 @@ class UserControllerTest {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<ListUsersResponseContent> result = userController.listUsers(1, 20, null, null, null, null, "test-request-id", null, null)
+        ListUsersResponseContent result = userController.listUsers(1, 20, null, null, null, null, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
 }

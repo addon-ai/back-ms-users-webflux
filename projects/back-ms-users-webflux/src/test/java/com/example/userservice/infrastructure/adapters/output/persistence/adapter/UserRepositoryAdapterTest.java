@@ -170,7 +170,7 @@ class UserRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaUserRepository.findBySearchTerm(searchTerm, offset, limit))
+        when(jpaUserRepository.findBySearchTerm(searchTerm, limit, offset))
             .thenReturn(Flux.just(userDbo));
         when(userMapper.toDomain(userDbo)).thenReturn(domainUser);
 
@@ -197,7 +197,7 @@ class UserRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaUserRepository.findByFilters(search, status, dateFrom, dateTo, offset, limit))
+        when(jpaUserRepository.findByFilters(search, status, dateFrom, dateTo, limit, offset))
             .thenReturn(Flux.just(userDbo));
         when(userMapper.toDomain(userDbo)).thenReturn(domainUser);
 

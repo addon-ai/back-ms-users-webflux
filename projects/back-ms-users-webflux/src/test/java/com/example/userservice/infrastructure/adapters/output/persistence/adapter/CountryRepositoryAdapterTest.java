@@ -170,7 +170,7 @@ class CountryRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaCountryRepository.findBySearchTerm(searchTerm, offset, limit))
+        when(jpaCountryRepository.findBySearchTerm(searchTerm, limit, offset))
             .thenReturn(Flux.just(countryDbo));
         when(countryMapper.toDomain(countryDbo)).thenReturn(domainCountry);
 
@@ -197,7 +197,7 @@ class CountryRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaCountryRepository.findByFilters(search, status, dateFrom, dateTo, offset, limit))
+        when(jpaCountryRepository.findByFilters(search, status, dateFrom, dateTo, limit, offset))
             .thenReturn(Flux.just(countryDbo));
         when(countryMapper.toDomain(countryDbo)).thenReturn(domainCountry);
 

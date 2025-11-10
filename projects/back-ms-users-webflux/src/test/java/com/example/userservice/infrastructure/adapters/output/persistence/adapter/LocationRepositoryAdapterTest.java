@@ -170,7 +170,7 @@ class LocationRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaLocationRepository.findBySearchTerm(searchTerm, offset, limit))
+        when(jpaLocationRepository.findBySearchTerm(searchTerm, limit, offset))
             .thenReturn(Flux.just(locationDbo));
         when(locationMapper.toDomain(locationDbo)).thenReturn(domainLocation);
 
@@ -197,7 +197,7 @@ class LocationRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaLocationRepository.findByFilters(search, status, dateFrom, dateTo, offset, limit))
+        when(jpaLocationRepository.findByFilters(search, status, dateFrom, dateTo, limit, offset))
             .thenReturn(Flux.just(locationDbo));
         when(locationMapper.toDomain(locationDbo)).thenReturn(domainLocation);
 

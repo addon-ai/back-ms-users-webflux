@@ -9,8 +9,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import reactor.core.publisher.Mono;
 
 import java.time.Duration;
@@ -64,12 +62,11 @@ class {{classname}}Test {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<Create{{entityName}}ResponseContent> result = {{entityVarName}}Controller.create{{entityName}}(request, "test-request-id", null, null)
+        Create{{entityName}}ResponseContent result = {{entityVarName}}Controller.create{{entityName}}(request, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.CREATED, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 {{/hasCreate}}
 
@@ -85,12 +82,11 @@ class {{classname}}Test {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<Get{{entityName}}ResponseContent> result = {{entityVarName}}Controller.get{{entityName}}({{entityVarName}}Id, "test-request-id", null, null)
+        Get{{entityName}}ResponseContent result = {{entityVarName}}Controller.get{{entityName}}({{entityVarName}}Id, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 {{/hasGet}}
 
@@ -122,12 +118,11 @@ class {{classname}}Test {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<Update{{entityName}}ResponseContent> result = {{entityVarName}}Controller.update{{entityName}}({{entityVarName}}Id, request, "test-request-id", null, null)
+        Update{{entityName}}ResponseContent result = {{entityVarName}}Controller.update{{entityName}}({{entityVarName}}Id, request, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 {{/hasUpdate}}
 
@@ -145,12 +140,11 @@ class {{classname}}Test {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<Delete{{entityName}}ResponseContent> result = {{entityVarName}}Controller.delete{{entityName}}({{entityVarName}}Id, "test-request-id", null, null)
+        Delete{{entityName}}ResponseContent result = {{entityVarName}}Controller.delete{{entityName}}({{entityVarName}}Id, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 {{/hasDelete}}
 
@@ -165,12 +159,11 @@ class {{classname}}Test {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<List{{entityName}}sResponseContent> result = {{entityVarName}}Controller.list{{entityName}}s(1, 20, null, null, null, null, "test-request-id", null, null)
+        List{{entityName}}sResponseContent result = {{entityVarName}}Controller.list{{entityName}}s(1, 20, null, null, null, null, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 {{/hasList}}
 
@@ -185,12 +178,11 @@ class {{classname}}Test {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<{{responseType}}> result = {{entityVarName}}Controller.{{methodName}}({{#pathVariables}}"test-{{name}}"{{#hasMore}}, {{/hasMore}}{{/pathVariables}}{{#pathVariables}}, {{/pathVariables}}"test-request-id", null, null)
+        {{responseType}} result = {{entityVarName}}Controller.{{methodName}}({{#pathVariables}}"test-{{name}}"{{#hasMore}}, {{/hasMore}}{{/pathVariables}}{{#pathVariables}}, {{/pathVariables}}"test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
 {{/complexOperations}}

@@ -170,7 +170,7 @@ class {{entityName}}RepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpa{{entityName}}Repository.findBySearchTerm(searchTerm, offset, limit))
+        when(jpa{{entityName}}Repository.findBySearchTerm(searchTerm, limit, offset))
             .thenReturn(Flux.just({{entityVarName}}Dbo));
         when({{entityVarName}}Mapper.toDomain({{entityVarName}}Dbo)).thenReturn(domain{{entityName}});
 
@@ -197,7 +197,7 @@ class {{entityName}}RepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpa{{entityName}}Repository.findByFilters(search, status, dateFrom, dateTo, offset, limit))
+        when(jpa{{entityName}}Repository.findByFilters(search, status, dateFrom, dateTo, limit, offset))
             .thenReturn(Flux.just({{entityVarName}}Dbo));
         when({{entityVarName}}Mapper.toDomain({{entityVarName}}Dbo)).thenReturn(domain{{entityName}});
 

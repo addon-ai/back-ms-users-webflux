@@ -57,12 +57,11 @@ class LocationControllerTest {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<CreateLocationResponseContent> result = locationController.createLocation(request, "test-request-id", null, null)
+        CreateLocationResponseContent result = locationController.createLocation(request, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.CREATED, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
     @Test
@@ -76,12 +75,11 @@ class LocationControllerTest {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<GetLocationResponseContent> result = locationController.getLocation(locationId, "test-request-id", null, null)
+        GetLocationResponseContent result = locationController.getLocation(locationId, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
     @Test
@@ -104,12 +102,11 @@ class LocationControllerTest {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<UpdateLocationResponseContent> result = locationController.updateLocation(locationId, request, "test-request-id", null, null)
+        UpdateLocationResponseContent result = locationController.updateLocation(locationId, request, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
     @Test
@@ -125,12 +122,11 @@ class LocationControllerTest {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<DeleteLocationResponseContent> result = locationController.deleteLocation(locationId, "test-request-id", null, null)
+        DeleteLocationResponseContent result = locationController.deleteLocation(locationId, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
     @Test
@@ -143,12 +139,11 @@ class LocationControllerTest {
             .thenReturn(Mono.just(response));
 
         // When
-        ResponseEntity<ListLocationsResponseContent> result = locationController.listLocations(1, 20, null, null, null, null, "test-request-id", null, null)
+        ListLocationsResponseContent result = locationController.listLocations(1, 20, null, null, null, null, "test-request-id", null, null)
             .block(Duration.ofSeconds(5));
 
         // Then
-        assertEquals(HttpStatus.OK, result.getStatusCode());
-        assertEquals(response, result.getBody());
+        assertEquals(response, result);
     }
 
 }

@@ -170,7 +170,7 @@ class CityRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaCityRepository.findBySearchTerm(searchTerm, offset, limit))
+        when(jpaCityRepository.findBySearchTerm(searchTerm, limit, offset))
             .thenReturn(Flux.just(cityDbo));
         when(cityMapper.toDomain(cityDbo)).thenReturn(domainCity);
 
@@ -197,7 +197,7 @@ class CityRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaCityRepository.findByFilters(search, status, dateFrom, dateTo, offset, limit))
+        when(jpaCityRepository.findByFilters(search, status, dateFrom, dateTo, limit, offset))
             .thenReturn(Flux.just(cityDbo));
         when(cityMapper.toDomain(cityDbo)).thenReturn(domainCity);
 

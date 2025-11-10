@@ -20,7 +20,7 @@ server:
 
 logging:
   level:
-    : ${LOG_LEVEL:INFO}
+    root: ${LOG_LEVEL:INFO}
     org.springframework.security: ${SECURITY_LOG_LEVEL:WARN}
 
 springdoc:

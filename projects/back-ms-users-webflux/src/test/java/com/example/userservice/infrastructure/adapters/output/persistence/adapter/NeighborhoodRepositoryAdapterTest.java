@@ -170,7 +170,7 @@ class NeighborhoodRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaNeighborhoodRepository.findBySearchTerm(searchTerm, offset, limit))
+        when(jpaNeighborhoodRepository.findBySearchTerm(searchTerm, limit, offset))
             .thenReturn(Flux.just(neighborhoodDbo));
         when(neighborhoodMapper.toDomain(neighborhoodDbo)).thenReturn(domainNeighborhood);
 
@@ -197,7 +197,7 @@ class NeighborhoodRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaNeighborhoodRepository.findByFilters(search, status, dateFrom, dateTo, offset, limit))
+        when(jpaNeighborhoodRepository.findByFilters(search, status, dateFrom, dateTo, limit, offset))
             .thenReturn(Flux.just(neighborhoodDbo));
         when(neighborhoodMapper.toDomain(neighborhoodDbo)).thenReturn(domainNeighborhood);
 

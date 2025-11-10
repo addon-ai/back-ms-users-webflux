@@ -170,7 +170,7 @@ class RegionRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaRegionRepository.findBySearchTerm(searchTerm, offset, limit))
+        when(jpaRegionRepository.findBySearchTerm(searchTerm, limit, offset))
             .thenReturn(Flux.just(regionDbo));
         when(regionMapper.toDomain(regionDbo)).thenReturn(domainRegion);
 
@@ -197,7 +197,7 @@ class RegionRepositoryAdapterTest {
         Long offset = 0L;
         Long limit = 10L;
         
-        when(jpaRegionRepository.findByFilters(search, status, dateFrom, dateTo, offset, limit))
+        when(jpaRegionRepository.findByFilters(search, status, dateFrom, dateTo, limit, offset))
             .thenReturn(Flux.just(regionDbo));
         when(regionMapper.toDomain(regionDbo)).thenReturn(domainRegion);
 

@@ -1,0 +1,19 @@
+site_name: Hexagonal Architecture Templates
+site_description: Spring Boot service templates with Hexagonal Architecture
+site_author: addon-ai
+repo_url: https://github.com/addon-ai/backstage-templates
+
+theme:
+  name: material
+  palette:
+    primary: indigo
+    accent: indigo
+
+nav:
+  - Home: index.md
+
+markdown_extensions:
+  - admonition
+  - codehilite
+  - toc:
+      permalink: true

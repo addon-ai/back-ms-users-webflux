@@ -1,0 +1,196 @@
+# Hexagonal Architecture Templates
+
+Welcome to the Hexagonal Architecture Templates documentation.
+
+## Overview
+
+This repository provides Backstage Software Templates for creating Spring Boot microservices following Hexagonal Architecture principles (Ports and Adapters pattern).
+
+## Available Templates
+
+{{#templates}}
+### {{name}}
+**Type**: {{type}}  
+**Description**: {{description}}
+
+{{/templates}}
+
+## Technology Stack
+
+### Core Dependencies
+
+| Dependency | Version |
+|------------|---------|
+| Java | {{javaVersion}} |
+| Spring Boot | {{springBootVersion}} |
+| MapStruct | {{mapstructVersion}} |
+| Lombok | {{lombokVersion}} |
+| Springdoc OpenAPI | {{springdocVersion}} |
+
+### Database
+
+| Component | Version |
+|-----------|---------|
+| PostgreSQL | {{postgresqlVersion}} |
+| Flyway | {{flywayVersion}} |
+| H2 (Testing) | {{h2Version}} |
+
+### Build Tools
+
+| Tool | Version |
+|------|---------|
+| Maven Compiler | {{mavenCompilerVersion}} |
+| Maven Surefire | {{mavenSurefireVersion}} |
+| Jacoco | {{jacocoVersion}} |
+
+### Additional Libraries
+
+- **Lombok-MapStruct Binding**: {{lombokMapstructBindingVersion}}
+- **Maven Wrapper**: {{mavenWrapperVersion}}
+
+## Architecture
+
+All templates follow the Hexagonal Architecture pattern with three main layers:
+
+### Domain Layer
+- **Purpose**: Core business logic and entities
+- **Dependencies**: None (pure domain)
+- **Components**: Domain models, business rules, domain exceptions
+
+### Application Layer
+- **Purpose**: Use cases and application services
+- **Dependencies**: Domain layer only
+- **Components**: 
+  - Input Ports (use case interfaces)
+  - Output Ports (repository interfaces)
+  - DTOs (Data Transfer Objects)
+  - MapStruct mappers
+
+### Infrastructure Layer
+- **Purpose**: External adapters and technical implementations
+- **Dependencies**: Application and Domain layers
+- **Components**:
+  - REST Controllers (input adapters)
+  - JPA/R2DBC Repositories (output adapters)
+  - Database entities
+  - Configuration classes
+
+## Features
+
+### Code Quality
+- **Test Coverage**: Minimum {{coverageThreshold}}% enforced by Jacoco
+- **Code Generation**: MapStruct for type-safe mappings
+- **Boilerplate Reduction**: Lombok annotations
+
+### Database
+- **SGBD**: PostgreSQL {{postgresqlDbVersion}}
+- **Migration Tool**: Flyway
+- **Connection Pooling**: HikariCP (Spring Boot default)
+- **Testing**: H2 in-memory database
+
+### API Documentation
+- **Tool**: Springdoc OpenAPI {{springdocVersion}}
+- **Format**: OpenAPI 3.0
+- **UI**: Swagger UI included
+
+### DevOps
+- **CI/CD**: GitHub Actions workflows included
+- **Containerization**: Docker and docker-compose
+- **Java Distribution**: {{javaDistribution}}
+- **Maven Options**: {{mavenOpts}}
+
+## Getting Started
+
+### Prerequisites
+- Java {{javaVersion}}
+- Maven {{mavenWrapperVersion}}
+- Docker (optional, for local development)
+
+### Using Templates
+
+1. **Access Backstage UI**
+   - Navigate to your Backstage instance
+   - Go to "Create" section
+
+2. **Select Template**
+   - Choose from available templates
+   - Review template description
+
+3. **Configure Parameters**
+   - Component ID (service name)
+   - Group ID (Maven group)
+   - Owner (team/user)
+   - Additional options
+
+4. **Create Service**
+   - Click "Create"
+   - Wait for scaffolding to complete
+   - Access your new repository
+
+### Local Development
+
+```bash
+# Clone repository
+git clone <repository-url>
+
+# Run with Maven
+mvn spring-boot:run
+
+# Run with Docker Compose
+docker-compose up
+
+# Run tests
+mvn test
+
+# Check coverage
+mvn verify
+```
+
+## Configuration
+
+### Environment Profiles
+
+All templates include multiple environment profiles:
+
+- `local` - Local development
+- `develop` - Development environment
+- `test` - Testing environment
+- `staging` - Staging environment
+- `prod` - Production environment
+
+### Database Configuration
+
+Default PostgreSQL configuration:
+- **Port**: 5432
+- **Database**: `<service-name>_db`
+- **User**: postgres
+- **Migrations**: Flyway scripts in `src/main/resources/db/migration/`
+
+## CI/CD Pipeline
+
+Generated projects include GitHub Actions workflows:
+
+### Build & Test
+- Runs on every push
+- Executes all tests
+- Generates coverage report
+
+### Quality Gates
+- Minimum {{coverageThreshold}}% code coverage
+- Build must pass
+- Tests must pass
+
+### Artifacts
+- JAR file generation
+- Docker image build
+- Retention: {{artifactRetentionDays}} days
+
+## Support
+
+- **Organization**: {{githubOrg}}
+- **Repository**: https://github.com/{{githubOrg}}/backstage-templates
+- **Contact**: Platform Team
+
+## License
+
+{{license}}

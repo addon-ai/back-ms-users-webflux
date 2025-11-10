@@ -25,7 +25,6 @@ class BackstageGoldenPathGenerator:
         output_path = Path(output_dir)
         output_path.mkdir(parents=True, exist_ok=True)
         
-        generated_templates = set()
         template_info = []
         
         for project_config in self.projects:
@@ -36,16 +35,11 @@ class BackstageGoldenPathGenerator:
                 print(f"⚠️  Project {project_name} not found, skipping...")
                 continue
             
-            stack_type = 'webflux' if 'webflux' in project_name.lower() else 'springboot'
-            template_name = f"{stack_type}-service"
-            
-            if template_name in generated_templates:
-                print(f"⏭️  Skipping {project_name} - {template_name} already generated")
-                continue
+            project_type = project_config['project']['general']['type']
+            stack_type = 'webflux' if project_type == 'springWebflux' else 'springboot'
             
             print(f"📦 Generating Backstage template for {project_name} ({stack_type})...")
-            template_data = self.generate_template(source_project, output_path / template_name, project_config, stack_type)
-            generated_templates.add(template_name)
+            template_data = self.generate_template(source_project, output_path / project_name, project_config, stack_type)
             template_info.append(template_data)
         
         if template_info:
@@ -63,13 +57,14 @@ class BackstageGoldenPathGenerator:
         shutil.copytree(source_project, skeleton_path, ignore=ignore_files)
         
         project_info = project_config['project']
+        project_name = project_info['general']['name']
         github_org = project_config.get('devops', {}).get('github', {}).get('organization', 'your-org')
         
         # Generate template.yaml
         template_vars = {
-            'template_id': f"{stack_type}-service-template",
-            'template_title': f"Java {stack_type.title()} Service",
-            'template_description': f"Create a new Java {stack_type.title()} microservice with hexagonal architecture",
+            'template_id': f"{project_name}-template",
+            'template_title': project_info['general']['description'],
+            'template_description': project_info['general']['description'],
             'stack_type': stack_type,
             'default_owner': 'platform-team',
             'default_groupId': project_info['params']['groupId'],
@@ -144,7 +139,72 @@ class BackstageGoldenPathGenerator:
         catalog_file = output_path / 'catalog-info.yaml'
         catalog_file.write_text('\n'.join(catalog_content), encoding='utf-8')
         
+        # Generate additional files
+        first_project = self.projects[0]
+        common_vars = {
+            'githubOrg': github_org,
+            'javaVersion': first_project['project']['dependencies'].get('java', '21'),
+            'coverageThreshold': first_project.get('devops', {}).get('ci', {}).get('coverageThreshold', '85')
+        }
+        
+        self._render_template('README.md.mustache', output_path / 'README.md', common_vars)
+        self._render_template('mkdocs.yml.mustache', output_path / 'mkdocs.yml', common_vars)
+        
+        # catalog-components needs template list
+        components_vars = {
+            'githubOrg': github_org,
+            'templates': [{'folder': t['template_folder']} for t in template_info]
+        }
+        self._render_template('catalog-components.yaml.mustache', output_path / 'catalog-components.yaml', components_vars)
+        
+        # Generate docs directory with comprehensive info
+        docs_path = output_path / 'docs'
+        docs_path.mkdir(exist_ok=True)
+        
+        # Gather template information
+        template_list = []
+        for info in template_info:
+            proj = next(p for p in self.projects if p['project']['general']['name'] == info['template_folder'])
+            template_list.append({
+                'name': proj['project']['general']['name'],
+                'type': proj['project']['general']['type'],
+                'description': proj['project']['general']['description']
+            })
+        
+        # Comprehensive docs variables
+        deps = first_project['project']['dependencies']
+        devops = first_project.get('devops', {})
+        db = first_project.get('database', {})
+        maven = first_project.get('maven', {})
+        
+        docs_vars = {
+            'githubOrg': github_org,
+            'templates': template_list,
+            'javaVersion': deps.get('java', '21'),
+            'springBootVersion': deps.get('springBoot', '3.2.5'),
+            'mapstructVersion': deps.get('mapstruct', '1.5.5.Final'),
+            'lombokVersion': deps.get('lombok', '1.18.30'),
+            'springdocVersion': deps.get('springdoc', '2.1.0'),
+            'postgresqlVersion': deps.get('postgresql', '42.7.3'),
+            'flywayVersion': deps.get('flywayDatabasePostgresql', '10.10.0'),
+            'h2Version': deps.get('h2', '2.2.224'),
+            'mavenCompilerVersion': deps.get('mavenCompiler', '3.11.0'),
+            'mavenSurefireVersion': deps.get('mavenSurefire', '3.2.5'),
+            'jacocoVersion': deps.get('jacoco', '0.8.11'),
+            'lombokMapstructBindingVersion': deps.get('lombokMapstructBinding', '0.2.0'),
+            'mavenWrapperVersion': maven.get('wrapperVersion', '3.3.3'),
+            'coverageThreshold': devops.get('ci', {}).get('coverageThreshold', '85'),
+            'javaDistribution': devops.get('ci', {}).get('javaDistribution', 'temurin'),
+            'mavenOpts': devops.get('ci', {}).get('mavenOpts', '-Xmx1024m'),
+            'artifactRetentionDays': devops.get('ci', {}).get('artifactRetentionDays', '30'),
+            'postgresqlDbVersion': db.get('version', '15.0'),
+            'license': first_project['project']['general'].get('license', 'MIT')
+        }
+        
+        self._render_template('docs-index.md.mustache', docs_path / 'index.md', docs_vars)
+        
         print(f"\n📋 Root catalog generated: {catalog_file}")
+        print(f"📄 Additional files: README.md, mkdocs.yml, catalog-components.yaml, docs/index.md")
 
 
 def main():

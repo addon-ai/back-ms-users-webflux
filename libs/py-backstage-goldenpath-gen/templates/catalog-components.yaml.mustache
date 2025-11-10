@@ -1,0 +1,9 @@
+apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: hexagonal-architecture-templates-components
+  description: All template components
+spec:
+  type: url
+  targets:{{#templates}}
+    - https://github.com/{{githubOrg}}/backstage-templates/blob/main/{{folder}}/catalog-info.yaml{{/templates}}

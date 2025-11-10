@@ -26,6 +26,8 @@ public interface MovieRepositoryPort {
     
     Flux<Movie> findBySearchTerm(String search, Integer page, Integer size);
     
+    Flux<Movie> findByFilters(String search, String status, String dateFrom, String dateTo, Integer page, Integer size);
+    
     Flux<Movie> findAllPaged(Integer page, Integer size);
     
     Mono<Void> deleteById(String id);

@@ -51,6 +51,27 @@ public interface JpaRentalRepository extends R2dbcRepository<RentalDbo, UUID> {
     Mono<Long> countBySearchTerm(@Param("search") String search);
     
     /**
+     * Find entities with comprehensive filtering.
+     */
+    @Query("SELECT * FROM rentals u WHERE " +
+           "(:search IS NULL OR :search = '' OR " +
+           "LOWER(u.username) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(u.email) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(u.first_name) LIKE LOWER(CONCAT('%', :search, '%')) OR " +
+           "LOWER(u.last_name) LIKE LOWER(CONCAT('%', :search, '%'))) " +
+           "AND (:status IS NULL OR :status = '' OR u.status = :status) " +
+           "AND (:dateFrom IS NULL OR :dateFrom = '' OR u.created_at >= CAST(:dateFrom AS TIMESTAMP)) " +
+           "AND (:dateTo IS NULL OR :dateTo = '' OR u.created_at <= CAST(:dateTo AS TIMESTAMP)) " +
+           "ORDER BY u.created_at DESC " +
+           "LIMIT :limit OFFSET :offset")
+    Flux<RentalDbo> findByFilters(@Param("search") String search,
+                                          @Param("status") String status,
+                                          @Param("dateFrom") String dateFrom,
+                                          @Param("dateTo") String dateTo,
+                                          @Param("limit") Long limit,
+                                          @Param("offset") Long offset);
+    
+    /**
      * Find all entities with pagination.
      */
     @Query("SELECT * FROM rentals u ORDER BY u.created_at DESC LIMIT :limit OFFSET :offset")

@@ -26,6 +26,6 @@ public interface MovieUseCase {
 
     Mono<DeleteMovieResponseContent> delete(String movieId);
 
-    Mono<ListMoviesResponseContent> list(Integer page, Integer size, String search);
+    Mono<ListMoviesResponseContent> list(Integer page, Integer size, String search, String status, String dateFrom, String dateTo);
 
 }

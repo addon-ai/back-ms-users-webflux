@@ -99,17 +99,18 @@ public class LocationService implements LocationUseCase {
     }
 
     @Override
-    public Mono<ListLocationsResponseContent> list(Integer page, Integer size, String search) {
-        logger.info("Executing ListLocations with page: {}, size: {}, search: {}", page, size, search);
+    public Mono<ListLocationsResponseContent> list(Integer page, Integer size, String search, String status, String dateFrom, String dateTo) {
+        // Apply default values
+        String effectiveStatus = (status == null || status.trim().isEmpty()) ? "ACTIVE" : status;
+        String effectiveDateFrom = (dateFrom == null || dateFrom.trim().isEmpty()) ? 
+            java.time.Instant.now().minus(30, java.time.temporal.ChronoUnit.DAYS).toString() : dateFrom;
+        String effectiveDateTo = (dateTo == null || dateTo.trim().isEmpty()) ? 
+            java.time.Instant.now().toString() : dateTo;
         
-        Flux<Location> locationFlux;
-        if (search != null && !search.trim().isEmpty()) {
-            locationFlux = locationRepositoryPort.findBySearchTerm(search, page, size);
-        } else {
-            locationFlux = locationRepositoryPort.findAll();
-        }
+        logger.info("Executing ListLocations with page: {}, size: {}, search: {}, status: {} (effective: {}), dateFrom: {} (effective: {}), dateTo: {} (effective: {})", 
+                   page, size, search, status, effectiveStatus, dateFrom, effectiveDateFrom, dateTo, effectiveDateTo);
         
-        return locationFlux
+        return locationRepositoryPort.findByFilters(search, effectiveStatus, effectiveDateFrom, effectiveDateTo, page, size)
                 .collectList()
                 .map(locations -> {
                     logger.info("Retrieved {} locations successfully", locations.size());

@@ -29,7 +29,7 @@ public interface LocationUseCase {
 
     Mono<DeleteLocationResponseContent> delete(String locationId);
 
-    Mono<ListLocationsResponseContent> list(Integer page, Integer size, String search);
+    Mono<ListLocationsResponseContent> list(Integer page, Integer size, String search, String status, String dateFrom, String dateTo);
 
     Mono<GetNeighborhoodsByCityResponseContent> getNeighborhoodsByCity();
     Mono<GetRegionsByCountryResponseContent> getRegionsByCountry();

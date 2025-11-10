@@ -25,6 +25,6 @@ public interface RentalUseCase {
     Mono<UpdateRentalResponseContent> update(String rentalId, UpdateRentalRequestContent request);
 
 
-    Mono<ListRentalsResponseContent> list(Integer page, Integer size, String search);
+    Mono<ListRentalsResponseContent> list(Integer page, Integer size, String search, String status, String dateFrom, String dateTo);
 
 }

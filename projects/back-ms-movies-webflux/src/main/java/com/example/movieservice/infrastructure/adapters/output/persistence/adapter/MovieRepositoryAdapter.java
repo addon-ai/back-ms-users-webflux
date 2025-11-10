@@ -107,6 +107,20 @@ public class MovieRepositoryAdapter implements MovieRepositoryPort {
                 .onErrorMap(this::mapRepositoryException);
     }
     
+    @Override
+    public Flux<Movie> findByFilters(String search, String status, String dateFrom, String dateTo, Integer page, Integer size) {
+        logger.debug("Searching Movies with filters - search: {}, status: {}, dateFrom: {}, dateTo: {}, page: {}, size: {}", 
+                    search, status, dateFrom, dateTo, page, size);
+        
+        long limit = size != null && size > 0 ? size : 20L;
+        long offset = page != null && page > 0 ? (page - 1) * limit : 0L;
+        
+        return r2dbcRepository.findByFilters(search, status, dateFrom, dateTo, limit, offset)
+                .map(mapper::toDomain)
+                .doOnError(e -> logger.error("Database error while searching Movies with filters", e))
+                .onErrorMap(this::mapRepositoryException);
+    }
+    
     // Additional business methods for reactive operations
     public Mono<Long> countBySearchTerm(String search) {
         logger.debug("Counting Movies with search term: {}", search);

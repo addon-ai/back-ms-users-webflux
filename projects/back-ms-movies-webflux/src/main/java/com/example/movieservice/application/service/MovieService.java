@@ -96,17 +96,18 @@ public class MovieService implements MovieUseCase {
     }
 
     @Override
-    public Mono<ListMoviesResponseContent> list(Integer page, Integer size, String search) {
-        logger.info("Executing ListMovies with page: {}, size: {}, search: {}", page, size, search);
+    public Mono<ListMoviesResponseContent> list(Integer page, Integer size, String search, String status, String dateFrom, String dateTo) {
+        // Apply default values
+        String effectiveStatus = (status == null || status.trim().isEmpty()) ? "ACTIVE" : status;
+        String effectiveDateFrom = (dateFrom == null || dateFrom.trim().isEmpty()) ? 
+            java.time.Instant.now().minus(30, java.time.temporal.ChronoUnit.DAYS).toString() : dateFrom;
+        String effectiveDateTo = (dateTo == null || dateTo.trim().isEmpty()) ? 
+            java.time.Instant.now().toString() : dateTo;
         
-        Flux<Movie> movieFlux;
-        if (search != null && !search.trim().isEmpty()) {
-            movieFlux = movieRepositoryPort.findBySearchTerm(search, page, size);
-        } else {
-            movieFlux = movieRepositoryPort.findAll();
-        }
+        logger.info("Executing ListMovies with page: {}, size: {}, search: {}, status: {} (effective: {}), dateFrom: {} (effective: {}), dateTo: {} (effective: {})", 
+                   page, size, search, status, effectiveStatus, dateFrom, effectiveDateFrom, dateTo, effectiveDateTo);
         
-        return movieFlux
+        return movieRepositoryPort.findByFilters(search, effectiveStatus, effectiveDateFrom, effectiveDateTo, page, size)
                 .collectList()
                 .map(movies -> {
                     logger.info("Retrieved {} movies successfully", movies.size());

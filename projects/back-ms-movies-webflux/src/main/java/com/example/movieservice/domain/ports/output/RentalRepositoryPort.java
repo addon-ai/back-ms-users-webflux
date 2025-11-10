@@ -26,6 +26,8 @@ public interface RentalRepositoryPort {
     
     Flux<Rental> findBySearchTerm(String search, Integer page, Integer size);
     
+    Flux<Rental> findByFilters(String search, String status, String dateFrom, String dateTo, Integer page, Integer size);
+    
     Flux<Rental> findAllPaged(Integer page, Integer size);
     
     Mono<Void> deleteById(String id);

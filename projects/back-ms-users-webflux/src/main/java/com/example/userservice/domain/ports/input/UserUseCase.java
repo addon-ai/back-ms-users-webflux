@@ -26,6 +26,6 @@ public interface UserUseCase {
 
     Mono<DeleteUserResponseContent> delete(String userId);
 
-    Mono<ListUsersResponseContent> list(Integer page, Integer size, String search);
+    Mono<ListUsersResponseContent> list(Integer page, Integer size, String search, String status, String dateFrom, String dateTo);
 
 }

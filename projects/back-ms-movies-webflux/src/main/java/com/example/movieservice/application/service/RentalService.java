@@ -80,17 +80,18 @@ public class RentalService implements RentalUseCase {
 
 
     @Override
-    public Mono<ListRentalsResponseContent> list(Integer page, Integer size, String search) {
-        logger.info("Executing ListRentals with page: {}, size: {}, search: {}", page, size, search);
+    public Mono<ListRentalsResponseContent> list(Integer page, Integer size, String search, String status, String dateFrom, String dateTo) {
+        // Apply default values
+        String effectiveStatus = (status == null || status.trim().isEmpty()) ? "ACTIVE" : status;
+        String effectiveDateFrom = (dateFrom == null || dateFrom.trim().isEmpty()) ? 
+            java.time.Instant.now().minus(30, java.time.temporal.ChronoUnit.DAYS).toString() : dateFrom;
+        String effectiveDateTo = (dateTo == null || dateTo.trim().isEmpty()) ? 
+            java.time.Instant.now().toString() : dateTo;
         
-        Flux<Rental> rentalFlux;
-        if (search != null && !search.trim().isEmpty()) {
-            rentalFlux = rentalRepositoryPort.findBySearchTerm(search, page, size);
-        } else {
-            rentalFlux = rentalRepositoryPort.findAll();
-        }
+        logger.info("Executing ListRentals with page: {}, size: {}, search: {}, status: {} (effective: {}), dateFrom: {} (effective: {}), dateTo: {} (effective: {})", 
+                   page, size, search, status, effectiveStatus, dateFrom, effectiveDateFrom, dateTo, effectiveDateTo);
         
-        return rentalFlux
+        return rentalRepositoryPort.findByFilters(search, effectiveStatus, effectiveDateFrom, effectiveDateTo, page, size)
                 .collectList()
                 .map(rentals -> {
                     logger.info("Retrieved {} rentals successfully", rentals.size());

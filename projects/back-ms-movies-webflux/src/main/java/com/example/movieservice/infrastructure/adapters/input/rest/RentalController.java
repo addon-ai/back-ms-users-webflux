@@ -131,7 +131,7 @@ public class RentalController {
 
 
     @GetMapping
-    @Operation(summary = "List Rentals", description = "Retrieves a paginated list of Rentals with optional search")
+    @Operation(summary = "List Rentals", description = "Retrieves a paginated list of Rentals with optional search, status filter and date range")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Rentals retrieved successfully")
     })
@@ -142,6 +142,12 @@ public class RentalController {
             @RequestParam(defaultValue = "20") Integer size,
             @Parameter(description = "Search term for filtering")
             @RequestParam(required = false) String search,
+            @Parameter(description = "Rental status filter (ACTIVE, INACTIVE, PENDING, SUSPENDED, DELETED). Default: ACTIVE")
+            @RequestParam(required = false) String status,
+            @Parameter(description = "Start date for filtering by createdAt (ISO format: 2024-01-01T00:00:00Z)")
+            @RequestParam(required = false) String dateFrom,
+            @Parameter(description = "End date for filtering by createdAt (ISO format: 2024-12-31T23:59:59Z)")
+            @RequestParam(required = false) String dateTo,
             @Parameter(description = "Unique request identifier", required = true)
             @RequestHeader("X-Request-ID") String requestId,
             @Parameter(description = "Correlation identifier for transaction tracking")
@@ -150,10 +156,11 @@ public class RentalController {
             @RequestHeader(value = "X-Client-Id", required = false) String clientId) {
         return Mono.fromRunnable(() -> LoggingUtils.setRequestContext(requestId, correlationId, clientId))
                 .then(Mono.fromCallable(() -> {
-                    logger.info("Listing rentals with page: {}, size: {}, search: {}", page, size, search);
+                    logger.info("Listing rentals with page: {}, size: {}, search: {}, status: {}, dateFrom: {}, dateTo: {}", 
+                               page, size, search, status, dateFrom, dateTo);
                     return search == null ? "": search;
                 }))
-                .flatMap(searchTerm -> rentalUseCase.list(page, size, searchTerm))
+                .flatMap(searchTerm -> rentalUseCase.list(page, size, searchTerm, status, dateFrom, dateTo))
                 .doFinally(signal -> LoggingUtils.clearRequestContext());
     }
 

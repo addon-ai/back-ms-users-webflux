@@ -1,0 +1,83 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: webflux-template
+  description: Reactive Spring WebFlux microservice template with hexagonal architecture
+  tags:
+    - java
+    - spring-boot
+    - webflux
+    - hexagonal-architecture
+    - reactive
+    - template
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: template
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: hexagonal-architecture-templates
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: webflux-domain-layer
+  description: Domain layer - Business logic and entities for Spring WebFlux template
+  tags:
+    - domain
+    - business-logic
+    - entities
+    - hexagonal-architecture
+    - reactive
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: webflux-template
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: webflux-application-layer
+  description: Application layer - Reactive Use cases, DTOs, mappers and services for Spring WebFlux template
+  tags:
+    - application
+    - use-cases
+    - services
+    - dto
+    - mappers
+    - hexagonal-architecture
+    - reactive
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: webflux-template
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: webflux-infrastructure-layer
+  description: Infrastructure layer - Reactive adapters, R2DBC persistence, WebFlux handlers and configuration for Spring WebFlux template
+  tags:
+    - infrastructure
+    - adapters
+    - r2dbc
+    - persistence
+    - webflux-handlers
+    - configuration
+    - hexagonal-architecture
+    - reactive
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: webflux-template

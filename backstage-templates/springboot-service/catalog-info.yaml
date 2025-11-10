@@ -1,0 +1,77 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: springboot-template
+  description: Spring Boot microservice template with hexagonal architecture
+  tags:
+    - java
+    - spring-boot
+    - hexagonal-architecture
+    - template
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: template
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: hexagonal-architecture-templates
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: springboot-domain-layer
+  description: Domain layer - Business logic and entities for Spring Boot template
+  tags:
+    - domain
+    - business-logic
+    - entities
+    - hexagonal-architecture
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: springboot-template
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: springboot-application-layer
+  description: Application layer - Use cases, DTOs, mappers and services for Spring Boot template
+  tags:
+    - application
+    - use-cases
+    - services
+    - dto
+    - mappers
+    - hexagonal-architecture
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: springboot-template
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: springboot-infrastructure-layer
+  description: Infrastructure layer - Adapters, persistence, REST controllers and configuration for Spring Boot template
+  tags:
+    - infrastructure
+    - adapters
+    - persistence
+    - rest-controllers
+    - configuration
+    - hexagonal-architecture
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: springboot-template

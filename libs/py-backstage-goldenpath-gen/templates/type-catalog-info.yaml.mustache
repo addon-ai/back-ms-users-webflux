@@ -1,0 +1,84 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: {{templateName}}-template
+  description: {{description}}
+  tags:
+    - java
+    - spring-boot{{#isWebflux}}
+    - webflux{{/isWebflux}}
+    - hexagonal-architecture{{#isWebflux}}
+    - reactive{{/isWebflux}}
+    - template
+  annotations:
+    github.com/project-slug: {{githubOrg}}/backstage-templates
+    backstage.io/techdocs-ref: dir:.
+spec:
+  type: template
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: hexagonal-architecture-templates
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: {{templateName}}-domain-layer
+  description: Domain layer - Business logic and entities for {{stackName}} template
+  tags:
+    - domain
+    - business-logic
+    - entities
+    - hexagonal-architecture{{#isWebflux}}
+    - reactive{{/isWebflux}}
+  annotations:
+    github.com/project-slug: {{githubOrg}}/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: {{templateName}}-template
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: {{templateName}}-application-layer
+  description: Application layer - {{#isWebflux}}Reactive {{/isWebflux}}Use cases, DTOs, mappers and services for {{stackName}} template
+  tags:
+    - application
+    - use-cases
+    - services
+    - dto
+    - mappers
+    - hexagonal-architecture{{#isWebflux}}
+    - reactive{{/isWebflux}}
+  annotations:
+    github.com/project-slug: {{githubOrg}}/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: {{templateName}}-template
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: {{templateName}}-infrastructure-layer
+  description: Infrastructure layer - {{#isWebflux}}Reactive adapters, R2DBC persistence, WebFlux handlers{{/isWebflux}}{{^isWebflux}}Adapters, persistence, REST controllers{{/isWebflux}} and configuration for {{stackName}} template
+  tags:
+    - infrastructure
+    - adapters{{#isWebflux}}
+    - r2dbc{{/isWebflux}}
+    - persistence{{#isWebflux}}
+    - webflux-handlers{{/isWebflux}}{{^isWebflux}}
+    - rest-controllers{{/isWebflux}}
+    - configuration
+    - hexagonal-architecture{{#isWebflux}}
+    - reactive{{/isWebflux}}
+  annotations:
+    github.com/project-slug: {{githubOrg}}/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: {{templateName}}-template

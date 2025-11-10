@@ -44,6 +44,7 @@ class BackstageGoldenPathGenerator:
         
         if template_info:
             self._generate_root_catalog(output_path, template_info)
+            self._generate_type_docs(output_path)
     
     def generate_template(self, source_project: Path, output_path: Path, project_config: dict, stack_type: str):
         """Generate a single Backstage template with skeleton."""
@@ -150,6 +151,12 @@ class BackstageGoldenPathGenerator:
         self._render_template('README.md.mustache', output_path / 'README.md', common_vars)
         self._render_template('mkdocs.yml.mustache', output_path / 'mkdocs.yml', common_vars)
         
+        # Copy .gitignore from first project
+        first_project_name = self.projects[0]['project']['general']['name']
+        source_gitignore = Path('projects') / first_project_name / '.gitignore'
+        if source_gitignore.exists():
+            shutil.copy(source_gitignore, output_path / '.gitignore')
+        
         # catalog-components needs template list
         components_vars = {
             'githubOrg': github_org,
@@ -205,6 +212,69 @@ class BackstageGoldenPathGenerator:
         
         print(f"\n📋 Root catalog generated: {catalog_file}")
         print(f"📄 Additional files: README.md, mkdocs.yml, catalog-components.yaml, docs/index.md")
+    
+    def _generate_type_docs(self, output_path: Path):
+        """Generate springboot-service and webflux-service documentation folders."""
+        first_project = self.projects[0]
+        deps = first_project['project']['dependencies']
+        
+        types = [
+            {
+                'folder': 'springboot-service',
+                'title': 'Spring Boot Service Template',
+                'description': 'Spring Boot microservice template with hexagonal architecture',
+                'stackName': 'Spring Boot',
+                'dbType': 'JPA con PostgreSQL/MySQL/H2'
+            },
+            {
+                'folder': 'webflux-service',
+                'title': 'WebFlux Service Template',
+                'description': 'Reactive Spring WebFlux microservice template with hexagonal architecture',
+                'stackName': 'Spring WebFlux',
+                'dbType': 'R2DBC con PostgreSQL/MySQL/H2'
+            }
+        ]
+        
+        for type_info in types:
+            type_path = output_path / type_info['folder']
+            type_path.mkdir(exist_ok=True)
+            
+            # Generate mkdocs.yml
+            mkdocs_vars = {
+                'title': type_info['title'],
+                'description': type_info['description']
+            }
+            self._render_template('type-mkdocs.yml.mustache', type_path / 'mkdocs.yml', mkdocs_vars)
+            
+            # Generate docs/
+            docs_path = type_path / 'docs'
+            docs_path.mkdir(exist_ok=True)
+            
+            docs_vars = {
+                'title': type_info['title'],
+                'stackName': type_info['stackName'],
+                'javaVersion': deps.get('java', '21'),
+                'springBootVersion': deps.get('springBoot', '3.2.5'),
+                'dbType': type_info['dbType']
+            }
+            
+            self._render_template('type-docs-index.md.mustache', docs_path / 'index.md', docs_vars)
+            self._render_template('domain-layer.md.mustache', docs_path / 'domain-layer.md', {})
+            self._render_template('application-layer.md.mustache', docs_path / 'application-layer.md', {})
+            self._render_template('infrastructure-layer.md.mustache', docs_path / 'infrastructure-layer.md', {})
+            
+            # Generate catalog-info.yaml
+            github_org = self.projects[0].get('devops', {}).get('github', {}).get('organization', 'addon-ai')
+            catalog_vars = {
+                'templateName': type_info['folder'].replace('-service', ''),
+                'description': type_info['description'],
+                'stackName': type_info['stackName'],
+                'isWebflux': 'webflux' in type_info['folder'],
+                'githubOrg': github_org
+            }
+            self._render_template('type-catalog-info.yaml.mustache', type_path / 'catalog-info.yaml', catalog_vars)
+        
+        print(f"📚 Type docs: springboot-service/ and webflux-service/ with mkdocs")
 
 
 def main():

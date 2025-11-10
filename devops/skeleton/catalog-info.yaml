@@ -8,12 +8,9 @@ metadata:
     backstage.io/techdocs-ref: dir:.
     backstage.io/source-location: url:https://github.com/${{ values.destination.owner }}/${{ values.destination.repo }}
   tags:
-    - java
-    - spring-boot
-    - webflux
-    - hexagonal-architecture
-    - reactive
-    - r2dbc
+{{#each values.tags}}
+    - ${{ this }}
+{{/each}}
   links:
     - url: https://github.com/${{ values.destination.owner }}/${{ values.destination.repo }}
       title: Repository
@@ -23,9 +20,9 @@ metadata:
       icon: docs
 spec:
   type: service
-  lifecycle: ${{ values.lifecycle | default("experimental") }}
+  lifecycle: ${{ values.lifecycle }}
   owner: ${{ values.owner }}
-  system: ${{ values.system | default("backend-services") }}
+  system: ${{ values.system }}
   providesApis:
     - ${{ values.component_id }}-api
   dependsOn:

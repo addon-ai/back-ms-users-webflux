@@ -1,31 +1,17 @@
-{% set repo = values.repoUrl | parseRepoUrl %}
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: ${{ values.component_id }}
-  description: ${{ values.description }}
-  annotations:
-    github.com/project-slug: ${{ repo.owner + '/' + repo.repo }}
-    backstage.io/techdocs-ref: dir:.
-    backstage.io/source-location: url:${{ values.repoUrl }}
+  name: back-ms-movies
+  description: Microservice for movie rental management
   tags:
     - java
-    - spring-boot
     - springBoot
     - hexagonal-architecture
-  links:
-    - url: ${{ values.repoUrl }}
-      title: Repository
-      icon: github
-    - url: ${{ values.repoUrl }}/blob/main/README.md
-      title: Documentation
-      icon: docs
+    - template
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
 spec:
-  type: service
-  lifecycle: ${{ values.lifecycle | default("experimental") }}
-  owner: ${{ values.owner }}
-  system: ${{ values.system | default("") }}
-  providesApis:
-    - ${{ values.component_id }}-api
-  dependsOn:
-    - resource:${{ values.component_id }}-database
+  type: template
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: hexagonal-architecture-templates

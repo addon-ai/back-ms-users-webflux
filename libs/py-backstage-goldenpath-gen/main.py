@@ -54,11 +54,8 @@ class BackstageGoldenPathGenerator:
         # Generate docs/index.md
         self._generate_docs_index(project_name, docs_dir)
         
-        # Copy OpenAPI specs from Smithy build
+        # Copy OpenAPI specs from Smithy build and generate entities
         self._copy_openapi_specs(project_name, project_dir)
-        
-        # Generate entities.yml
-        self._generate_entities_yml(project_name, config, project_dir)
         
         # Generate skeleton/catalog-info.yaml (for generated projects)
         self._generate_skeleton_catalog(project_name, config, skeleton_dir)
@@ -180,7 +177,7 @@ class BackstageGoldenPathGenerator:
                 f.write(f"# {project_name}\n\nDocumentation coming soon...\n")
     
     def _copy_openapi_specs(self, project_name, project_dir):
-        """Copy OpenAPI specs from Smithy build output"""
+        """Copy OpenAPI specs from Smithy build output and generate entity files"""
         if not os.path.exists(self.smithy_build_path):
             return
         
@@ -191,31 +188,64 @@ class BackstageGoldenPathGenerator:
         openapi_dir = os.path.join(project_dir, 'openapi')
         os.makedirs(openapi_dir, exist_ok=True)
         
+        openapi_files = []
+        
         # Find projections that match this project
         for projection_name in projections.keys():
-            # Check if projection name starts with project name prefix
-            # e.g., back-ms-users matches back-ms-users and back-ms-users-location
             if projection_name.startswith(project_name.rsplit('-webflux', 1)[0]):
                 source_path = os.path.join('build', 'smithy', projection_name, 'openapi')
                 
                 if os.path.exists(source_path):
-                    # Copy all files from source to destination
                     for file in os.listdir(source_path):
-                        src_file = os.path.join(source_path, file)
-                        if os.path.isfile(src_file):
+                        if file.endswith('.openapi.json'):
+                            src_file = os.path.join(source_path, file)
                             dest_file = os.path.join(openapi_dir, file)
                             shutil.copy2(src_file, dest_file)
+                            openapi_files.append(file)
+        
+        # Generate entity files for each OpenAPI spec
+        self._generate_entity_files(project_name, project_dir, openapi_files)
     
-    def _generate_entities_yml(self, project_name, config, project_dir):
-        """Generate entities.yml for each project"""
-        template_path = os.path.join(self.templates_dir, "entities.yml.mustache")
-        with open(template_path, 'r') as f:
-            template = f.read()
-        
-        output = pystache.render(template, {})
-        
-        with open(os.path.join(project_dir, "entities.yml"), 'w') as f:
-            f.write(output)
+    def _generate_entity_files(self, project_name, project_dir, openapi_files):
+        """Generate individual entity files for each OpenAPI spec"""
+        for openapi_file in openapi_files:
+            # Extract service name from filename (e.g., UserService.openapi.json -> user-service)
+            service_name = openapi_file.replace('.openapi.json', '').replace('Service', '')
+            service_name_kebab = ''.join(['-' + c.lower() if c.isupper() else c for c in service_name]).lstrip('-')
+            
+            # Read OpenAPI file to get description
+            openapi_path = os.path.join(project_dir, 'openapi', openapi_file)
+            description = f"API for {service_name}"
+            
+            try:
+                with open(openapi_path, 'r') as f:
+                    openapi_spec = json.load(f)
+                    description = openapi_spec.get('info', {}).get('description', description)
+            except:
+                pass
+            
+            # Generate entity file
+            entity_content = f"""apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: {service_name_kebab}-api
+  description: {description}
+spec:
+  type: openapi
+  lifecycle: experimental
+  owner: platform-team
+  system: examples
+  definition:
+    $text: ../openapi/{openapi_file}
+"""
+            
+            # Create entities directory
+            entities_dir = os.path.join(project_dir, 'entities')
+            os.makedirs(entities_dir, exist_ok=True)
+            
+            entity_filename = f"{service_name_kebab}-entity.yml"
+            with open(os.path.join(entities_dir, entity_filename), 'w') as f:
+                f.write(entity_content)
     
     def _generate_collection_components(self, configs):
         """Generate collection-components.yml"""

@@ -1,0 +1,68 @@
+{
+  "domain": [
+    {
+      "file": "domain-model.yml",
+      "name": "domain-model",
+      "description": "Domain models and entities",
+      "tags": ["domain", "model", "entities", "hexagonal-architecture"]
+    },
+    {
+      "file": "domain-ports-input.yml",
+      "name": "domain-ports-input",
+      "description": "Input ports (use case interfaces)",
+      "tags": ["domain", "ports", "input", "use-cases", "hexagonal-architecture"]
+    },
+    {
+      "file": "domain-ports-output.yml",
+      "name": "domain-ports-output",
+      "description": "Output ports (repository interfaces)",
+      "tags": ["domain", "ports", "output", "repositories", "hexagonal-architecture"]
+    }
+  ],
+  "application": [
+    {
+      "file": "application-dto.yml",
+      "name": "application-dto",
+      "description": "Data Transfer Objects",
+      "tags": ["application", "dto", "data-transfer", "hexagonal-architecture"]
+    },
+    {
+      "file": "application-mapper.yml",
+      "name": "application-mapper",
+      "description": "MapStruct mappers for entity transformations",
+      "tags": ["application", "mapper", "mapstruct", "hexagonal-architecture"]
+    },
+    {
+      "file": "application-service.yml",
+      "name": "application-service",
+      "description": "Application services implementing use cases",
+      "tags": ["application", "service", "use-cases", "hexagonal-architecture"]
+    }
+  ],
+  "infrastructure": [
+    {
+      "file": "infrastructure-input-adapters.yml",
+      "name": "infrastructure-input-adapters",
+      "description": "Input adapters (REST controllers)",
+      "tags": ["infrastructure", "input-adapters", "rest", "controllers", "hexagonal-architecture"]
+    },
+    {
+      "file": "infrastructure-persistence-adapter.yml",
+      "name": "infrastructure-persistence-adapter",
+      "description": "Persistence adapter implementing repository ports",
+      "tags": ["infrastructure", "persistence", "adapter", "hexagonal-architecture"]
+    },
+    {
+      "file": "infrastructure-persistence-entity.yml",
+      "name": "infrastructure-persistence-entity",
+      "description": "JPA/R2DBC entities for database persistence",
+      "tags": ["infrastructure", "persistence", "entity", "database", "hexagonal-architecture"]
+    },
+    {
+      "file": "infrastructure-persistence-repository.yml",
+      "name": "infrastructure-persistence-repository",
+      "description": "JPA/R2DBC repository interfaces",
+      "tags": ["infrastructure", "persistence", "repository", "database", "hexagonal-architecture"]
+    }
+  ]
+}

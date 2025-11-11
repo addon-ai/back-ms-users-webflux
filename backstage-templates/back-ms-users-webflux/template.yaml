@@ -1,7 +1,7 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: back-ms-users-webflux-template
+  name: back-ms-users-webflux
   title: Reactive microservice for users management with Spring WebFlux
   description: Reactive microservice for users management with Spring WebFlux
   tags:

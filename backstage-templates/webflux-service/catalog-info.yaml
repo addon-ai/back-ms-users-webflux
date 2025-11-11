@@ -18,7 +18,7 @@ spec:
   type: template
   owner: platform-team
   lifecycle: production
-  subcomponentOf: hexagonal-architecture-templates
+  subcomponentOf: component:default/hexagonal-architecture-templates
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
@@ -37,7 +37,7 @@ spec:
   type: library
   owner: platform-team
   lifecycle: production
-  subcomponentOf: webflux-template
+  subcomponentOf: component:default/webflux-template
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
@@ -58,7 +58,7 @@ spec:
   type: library
   owner: platform-team
   lifecycle: production
-  subcomponentOf: webflux-template
+  subcomponentOf: component:default/webflux-template
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
@@ -80,4 +80,4 @@ spec:
   type: library
   owner: platform-team
   lifecycle: production
-  subcomponentOf: webflux-template
+  subcomponentOf: component:default/webflux-template

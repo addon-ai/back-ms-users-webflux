@@ -1,0 +1,15 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: {{templateName}}-{{componentName}}
+  description: {{description}} for {{stackName}} template
+  tags:{{#tags}}
+    - {{.}}{{/tags}}{{#isWebflux}}
+    - reactive{{/isWebflux}}
+  annotations:
+    github.com/project-slug: {{githubOrg}}/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: component:default/{{templateName}}-{{layerName}}

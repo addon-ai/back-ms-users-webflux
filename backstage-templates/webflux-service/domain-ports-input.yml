@@ -1,0 +1,19 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: webflux-domain-ports-input
+  description: Input ports (use case interfaces) for Spring WebFlux template
+  tags:
+    - domain
+    - ports
+    - input
+    - use-cases
+    - hexagonal-architecture
+    - reactive
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: component:default/webflux-domain-layer

@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: springboot-application-dto
+  description: Data Transfer Objects for Spring Boot template
+  tags:
+    - application
+    - dto
+    - data-transfer
+    - hexagonal-architecture
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: component:default/springboot-application-layer

@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: webflux-application-mapper
+  description: MapStruct mappers for entity transformations for Spring WebFlux template
+  tags:
+    - application
+    - mapper
+    - mapstruct
+    - hexagonal-architecture
+    - reactive
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: component:default/webflux-application-layer

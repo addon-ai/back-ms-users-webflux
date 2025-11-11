@@ -63,7 +63,7 @@ class BackstageGoldenPathGenerator:
         
         # Generate template.yaml
         template_vars = {
-            'template_id': f"{project_name}-template",
+            'template_id': project_name,
             'template_title': project_info['general']['description'],
             'template_description': project_info['general']['description'],
             'stack_type': stack_type,
@@ -273,8 +273,36 @@ class BackstageGoldenPathGenerator:
                 'githubOrg': github_org
             }
             self._render_template('type-catalog-info.yaml.mustache', type_path / 'catalog-info.yaml', catalog_vars)
+            
+            # Generate subcomponent YAML files
+            self._generate_subcomponents(type_path, type_info, github_org)
         
-        print(f"📚 Type docs: springboot-service/ and webflux-service/ with mkdocs")
+        print(f"📚 Type docs: springboot-service/ and webflux-service/ with mkdocs and subcomponents")
+    
+    def _generate_subcomponents(self, type_path: Path, type_info: dict, github_org: str):
+        """Generate individual YAML files for each hexagonal architecture subcomponent."""
+        import json
+        
+        subcomponents_file = self.templates_dir / 'subcomponents.json'
+        with open(subcomponents_file, 'r') as f:
+            subcomponents = json.load(f)
+        
+        template_name = type_info['folder'].replace('-service', '')
+        is_webflux = 'webflux' in type_info['folder']
+        
+        for layer, components in subcomponents.items():
+            for component in components:
+                vars = {
+                    'templateName': template_name,
+                    'componentName': component['name'],
+                    'description': component['description'],
+                    'stackName': type_info['stackName'],
+                    'tags': component['tags'],
+                    'isWebflux': is_webflux,
+                    'githubOrg': github_org,
+                    'layerName': f"{layer}-layer"
+                }
+                self._render_template('subcomponent.yml.mustache', type_path / component['file'], vars)
 
 
 def main():

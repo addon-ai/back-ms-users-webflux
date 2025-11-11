@@ -1,7 +1,7 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: back-ms-movies-template
+  name: back-ms-movies
   title: Microservice for movie rental management
   description: Microservice for movie rental management
   tags:

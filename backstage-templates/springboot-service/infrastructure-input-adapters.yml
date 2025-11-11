@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: springboot-infrastructure-input-adapters
+  description: Input adapters (REST controllers) for Spring Boot template
+  tags:
+    - infrastructure
+    - input-adapters
+    - rest
+    - controllers
+    - hexagonal-architecture
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: component:default/springboot-infrastructure-layer

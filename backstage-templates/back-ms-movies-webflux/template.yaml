@@ -1,7 +1,7 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: back-ms-movies-webflux-template
+  name: back-ms-movies-webflux
   title: Reactive microservice for movie rental management with Spring WebFlux
   description: Reactive microservice for movie rental management with Spring WebFlux
   tags:

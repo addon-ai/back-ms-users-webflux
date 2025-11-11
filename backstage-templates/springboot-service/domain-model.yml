@@ -1,17 +1,17 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: back-ms-users
-  description: Microservice for users management
+  name: springboot-domain-model
+  description: Domain models and entities for Spring Boot template
   tags:
-    - java
-    - springboot
+    - domain
+    - model
+    - entities
     - hexagonal-architecture
-    - template
   annotations:
     github.com/project-slug: addon-ai/backstage-templates
 spec:
-  type: template
+  type: library
   owner: platform-team
   lifecycle: production
-  subcomponentOf: component:default/hexagonal-architecture-templates
+  subcomponentOf: component:default/springboot-domain-layer

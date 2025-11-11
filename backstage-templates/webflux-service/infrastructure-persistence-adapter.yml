@@ -1,0 +1,18 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: webflux-infrastructure-persistence-adapter
+  description: Persistence adapter implementing repository ports for Spring WebFlux template
+  tags:
+    - infrastructure
+    - persistence
+    - adapter
+    - hexagonal-architecture
+    - reactive
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: component:default/webflux-infrastructure-layer

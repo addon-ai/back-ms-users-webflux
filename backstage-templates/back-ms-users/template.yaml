@@ -1,7 +1,7 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: back-ms-users-template
+  name: back-ms-users
   title: Microservice for users management
   description: Microservice for users management
   tags:

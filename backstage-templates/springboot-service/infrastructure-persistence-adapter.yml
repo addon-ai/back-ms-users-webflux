@@ -1,0 +1,17 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: springboot-infrastructure-persistence-adapter
+  description: Persistence adapter implementing repository ports for Spring Boot template
+  tags:
+    - infrastructure
+    - persistence
+    - adapter
+    - hexagonal-architecture
+  annotations:
+    github.com/project-slug: addon-ai/backstage-templates
+spec:
+  type: library
+  owner: platform-team
+  lifecycle: production
+  subcomponentOf: component:default/springboot-infrastructure-layer

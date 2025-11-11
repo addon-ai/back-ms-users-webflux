@@ -79,7 +79,7 @@ class BackstageGoldenPathGenerator:
         
         output = pystache.render(template, data)
         
-        with open(os.path.join(project_dir, "template.yaml"), 'w') as f:
+        with open(os.path.join(project_dir, "template.yml"), 'w') as f:
             f.write(output)
     
     def _generate_template_catalog_info(self, project_name, config, project_dir):
@@ -101,7 +101,7 @@ class BackstageGoldenPathGenerator:
         
         output = pystache.render(template, data)
         
-        with open(os.path.join(project_dir, "catalog-info.yaml"), 'w') as f:
+        with open(os.path.join(project_dir, "catalog-info.yml"), 'w') as f:
             f.write(output)
     
     def _generate_skeleton_catalog(self, project_name, config, skeleton_dir):
@@ -121,14 +121,11 @@ class BackstageGoldenPathGenerator:
         
         output = pystache.render(template, data)
         
-        with open(os.path.join(skeleton_dir, "catalog-info.yaml"), 'w') as f:
+        with open(os.path.join(skeleton_dir, "catalog-info.yml"), 'w') as f:
             f.write(output)
         
         # Generate README.md
         self._generate_skeleton_readme(skeleton_dir)
-        
-        # Generate .gitignore
-        self._generate_skeleton_gitignore(skeleton_dir)
     
     def _generate_skeleton_readme(self, skeleton_dir):
         """Generate skeleton/README.md"""
@@ -139,15 +136,7 @@ class BackstageGoldenPathGenerator:
         with open(os.path.join(skeleton_dir, "README.md"), 'w') as f:
             f.write(template)
     
-    def _generate_skeleton_gitignore(self, skeleton_dir):
-        """Generate skeleton/.gitignore"""
-        template_path = os.path.join(self.templates_dir, "skeleton-gitignore.mustache")
-        with open(template_path, 'r') as f:
-            template = f.read()
-        
-        with open(os.path.join(skeleton_dir, ".gitignore"), 'w') as f:
-            f.write(template)
-    
+
     def _generate_mkdocs(self, project_name, config, project_dir):
         """Generate mkdocs.yml"""
         template_path = os.path.join(self.templates_dir, "project-mkdocs.yml.mustache")
@@ -188,7 +177,7 @@ class BackstageGoldenPathGenerator:
         targets = []
         for config in configs:
             project_name = config['project']['general']['name']
-            targets.append(f"./{project_name}/catalog-info.yaml")
+            targets.append(f"./{project_name}/catalog-info.yml")
         
         data = {'targets': targets}
         output = pystache.render(template, data)

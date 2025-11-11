@@ -1,16 +1,17 @@
 apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
-  name: back-ms-users-webflux
-  description: Reactive microservice for users management with Spring WebFlux
+  name: back-ms-movies
+  description: Microservice for movie rental management
   tags:
     - java
-    - spring-webflux
+    - spring-boot
     - hexagonal-architecture
     - template
   annotations:
     github.com/project-slug: addon-ai/backstage-templates
+    backstage.io/techdocs-ref: dir:.
 spec:
-  type: template
+  type: service
   owner: platform-team
   lifecycle: production

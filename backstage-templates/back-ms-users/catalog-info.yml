@@ -19,5 +19,5 @@ spec:
   lifecycle: production
   system: users-system
   providesApis:
-    - user-api
     - location-api
+    - user-api

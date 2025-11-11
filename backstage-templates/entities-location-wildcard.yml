@@ -5,4 +5,4 @@ metadata:
   description: All entities using wildcard pattern
 spec:
   targets:
-    - https://github.com/addon-ai/backstage-templates/blob/main/*/entities/*.yml
+    - https://github.com/addon-ai/backstage-templates/blob/main/*/entities/*/*.yml

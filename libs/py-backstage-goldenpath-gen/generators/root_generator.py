@@ -84,7 +84,7 @@ metadata:
   description: All entities using wildcard pattern
 spec:
   targets:
-    - https://github.com/{github_org}/backstage-templates/blob/main/*/entities/*.yml
+    - https://github.com/{github_org}/backstage-templates/blob/main/*/entities/*/*.yml
 """
         with open(os.path.join(self.output_dir, "entities-location-wildcard.yml"), 'w') as f:
             f.write(entities_location_content)

@@ -20,6 +20,10 @@ class EntityGenerator:
             
             api_name = f"{service_name_kebab}-reactive-api" if is_webflux else f"{service_name_kebab}-api"
             
+            # Create entity subdirectory
+            entity_dir = os.path.join(entities_dir, service_name_kebab)
+            os.makedirs(entity_dir, exist_ok=True)
+            
             openapi_path = os.path.join(project_dir, 'openapi', openapi_file)
             description = f"API for {service_name}"
             
@@ -35,17 +39,19 @@ kind: API
 metadata:
   name: {api_name}
   description: {description}
+  annotations:
+    backstage.io/techdocs-ref: dir:.
 spec:
   type: openapi
   lifecycle: experimental
   owner: platform-team
   system: {system_name}
   definition:
-    $text: ../openapi/{openapi_file}
+    $text: ../../openapi/{openapi_file}
 """
             
             entity_filename = f"{service_name_kebab}-entity.yml"
-            with open(os.path.join(entities_dir, entity_filename), 'w') as f:
+            with open(os.path.join(entity_dir, entity_filename), 'w') as f:
                 f.write(entity_content)
     
     def get_provides_apis(self, project_name, project_dir):
@@ -55,9 +61,10 @@ spec:
         apis = []
         
         if os.path.exists(entities_dir):
-            for file in os.listdir(entities_dir):
-                if file.endswith('-entity.yml'):
-                    service_name = file.replace('-entity.yml', '')
+            for item in os.listdir(entities_dir):
+                item_path = os.path.join(entities_dir, item)
+                if os.path.isdir(item_path):
+                    service_name = item
                     api_name = f"{service_name}-reactive-api" if is_webflux else f"{service_name}-api"
                     apis.append(api_name)
         

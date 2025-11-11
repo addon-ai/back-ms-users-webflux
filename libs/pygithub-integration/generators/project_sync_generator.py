@@ -236,13 +236,15 @@ class ProjectSyncGenerator:
             # Determine which generator to use based on project name
             if '-webflux' in project_name:
                 generator_script = 'java-webflux-backend-generator.py'
+                templates_dir = os.path.join(self.project_root, 'libs', 'pyjava-webflux-backend-codegen', 'templates')
             else:
                 generator_script = 'java-springboot-backend-generator.py'
+                templates_dir = os.path.join(self.project_root, 'libs', 'pyjava-springboot-backend-codegen', 'templates')
             
             result = subprocess.run([
                 'python3', 
                 os.path.join(self.project_root, 'libs', generator_script),
-                os.path.join(self.project_root, 'libs', 'pyjava-springboot-backend-codegen', 'templates')
+                templates_dir
             ], check=True, capture_output=True, text=True)
             print(f"Regenerated project {project_name}")
         except subprocess.CalledProcessError as e:

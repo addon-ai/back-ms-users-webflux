@@ -21,14 +21,26 @@ class BackstageGoldenPathGenerator:
         
         os.makedirs(self.output_dir, exist_ok=True)
         
+        # Collect unique systems
+        systems = set()
+        
         # Generate catalog-info.yaml for each project
         for config in configs:
             project_name = config['project']['general']['name']
+            base_name = project_name.replace('-webflux', '').replace('back-ms-', '')
+            system_name = f"{base_name}-system"
+            systems.add((system_name, base_name))
             self._generate_project_catalog(project_name, config)
         
         # Generate collection files
         self._generate_collection_components(configs)
         self._generate_root_mkdocs()
+        
+        # Generate systems.yml
+        self._generate_systems_yml(systems)
+        
+        # Generate entities-location.yml
+        self._generate_entities_location()
         
         print(f"✅ Backstage collection files generated in {self.output_dir}/")
     
@@ -96,12 +108,17 @@ class BackstageGoldenPathGenerator:
         stack_type = config['project']['general'].get('type', 'springBoot')
         stack_type_kebab = 'spring-webflux' if 'webflux' in stack_type.lower() else 'spring-boot'
         
+        # Extract system name from project name
+        base_name = project_name.replace('-webflux', '').replace('back-ms-', '')
+        system_name = f"{base_name}-system"
+        
         data = {
             'template_id': project_name,
             'template_description': config['project']['general']['description'],
             'stack_type_kebab': stack_type_kebab,
             'github_org': config['devops']['github']['organization'],
-            'default_owner': 'platform-team'
+            'default_owner': 'platform-team',
+            'system_name': system_name
         }
         
         output = pystache.render(template, data)
@@ -118,10 +135,14 @@ class BackstageGoldenPathGenerator:
         stack_type = config['project']['general'].get('type', 'springBoot')
         stack_type_kebab = 'spring-webflux' if 'webflux' in stack_type.lower() else 'spring-boot'
         
+        # Extract system name from project name
+        base_name = project_name.replace('-webflux', '').replace('back-ms-', '')
+        system_name = f"{base_name}-system"
+        
         data = {
             'stack_type_kebab': stack_type_kebab,
             'is_webflux': 'webflux' in stack_type.lower(),
-            'system_name': 'default-system'
+            'system_name': system_name
         }
         
         output = pystache.render(template, data)
@@ -210,6 +231,10 @@ class BackstageGoldenPathGenerator:
         """Generate individual entity files for each OpenAPI spec"""
         is_webflux = '-webflux' in project_name
         
+        # Extract system name from project name (e.g., back-ms-movies -> movie-system)
+        base_name = project_name.replace('-webflux', '').replace('back-ms-', '')
+        system_name = f"{base_name}-system"
+        
         for openapi_file in openapi_files:
             # Extract service name from filename (e.g., UserService.openapi.json -> user)
             service_name = openapi_file.replace('.openapi.json', '').replace('Service', '')
@@ -242,7 +267,7 @@ spec:
   type: openapi
   lifecycle: experimental
   owner: platform-team
-  system: examples
+  system: {system_name}
   definition:
     $text: ../openapi/{openapi_file}
 """
@@ -256,21 +281,21 @@ spec:
                 f.write(entity_content)
     
     def _generate_collection_components(self, configs):
-        """Generate collection-components.yml"""
-        template_path = os.path.join(self.templates_dir, "collection-components.yml.mustache")
-        with open(template_path, 'r') as f:
-            template = f.read()
+        """Generate collection-components.yml with wildcard pattern"""
+        github_org = configs[0]['devops']['github']['organization'] if configs else 'addon-ai'
         
-        targets = []
-        for config in configs:
-            project_name = config['project']['general']['name']
-            targets.append(f"./{project_name}/catalog-info.yml")
-        
-        data = {'targets': targets}
-        output = pystache.render(template, data)
+        collection_content = f"""apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: hexagonal-components-location
+  description: All template components using wildcard pattern
+spec:
+  targets:
+    - https://github.com/{github_org}/backstage-templates/blob/main/*/catalog-info.yml
+"""
         
         with open(os.path.join(self.output_dir, "collection-components.yml"), 'w') as f:
-            f.write(output)
+            f.write(collection_content)
         
         # Generate .gitignore in root
         self._generate_root_gitignore()
@@ -309,6 +334,48 @@ spec:
 """
         with open(os.path.join(self.output_dir, "org.yml"), 'w') as f:
             f.write(org_content)
+    
+    def _generate_systems_yml(self, systems):
+        """Generate systems.yml with all unique systems"""
+        systems_list = sorted(systems)  # Sort for consistent output
+        
+        systems_content = []
+        for system_name, base_name in systems_list:
+            description = f"{base_name.replace('-', ' ').title()} management system"
+            system_yaml = f"""apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: {system_name}
+  description: {description}
+spec:
+  owner: platform-team"""
+            systems_content.append(system_yaml)
+        
+        full_content = "\n---\n".join(systems_content) + "\n"
+        
+        with open(os.path.join(self.output_dir, "systems.yml"), 'w') as f:
+            f.write(full_content)
+    
+    def _generate_entities_location(self):
+        """Generate entities-location.yml for importing all entities"""
+        # Get github org from config
+        with open(self.config_path, 'r') as f:
+            configs = json.load(f)
+        
+        github_org = configs[0]['devops']['github']['organization'] if configs else 'addon-ai'
+        
+        entities_location_content = f"""apiVersion: backstage.io/v1alpha1
+kind: Location
+metadata:
+  name: backstage-entities-wildcard
+  description: All entities using wildcard pattern
+spec:
+  targets:
+    - https://github.com/{github_org}/backstage-templates/blob/main/*/entities/*.yml
+"""
+        
+        with open(os.path.join(self.output_dir, "entities-location.yml"), 'w') as f:
+            f.write(entities_location_content)
     
     def _copy_project_to_skeleton(self, project_name, skeleton_dir):
         """Copy project files to skeleton excluding .java, .sql, .class, build, target"""

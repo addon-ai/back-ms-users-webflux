@@ -26,7 +26,7 @@ spec:
   type: service
   lifecycle: ${{ values.lifecycle | default("experimental") }}
   owner: ${{ values.owner }}
-  system: ${{ values.system | default("default-system") }}
+  system: ${{ values.system | default("users-system") }}
   providesApis:
     - ${{ values.component_id }}-api
   dependsOn:

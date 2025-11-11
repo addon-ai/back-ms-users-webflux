@@ -17,3 +17,4 @@ spec:
   type: service
   owner: platform-team
   lifecycle: production
+  system: movies-system

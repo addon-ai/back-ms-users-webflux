@@ -233,9 +233,15 @@ class ProjectSyncGenerator:
             original_cwd = os.getcwd()
             os.chdir(self.project_root)
             
+            # Determine which generator to use based on project name
+            if '-webflux' in project_name:
+                generator_script = 'java-webflux-backend-generator.py'
+            else:
+                generator_script = 'java-springboot-backend-generator.py'
+            
             result = subprocess.run([
                 'python3', 
-                os.path.join(self.project_root, 'libs', 'java-backend-generator.py'),
+                os.path.join(self.project_root, 'libs', generator_script),
                 os.path.join(self.project_root, 'libs', 'pyjava-springboot-backend-codegen', 'templates')
             ], check=True, capture_output=True, text=True)
             print(f"Regenerated project {project_name}")

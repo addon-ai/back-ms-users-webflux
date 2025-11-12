@@ -48,10 +48,10 @@ class BackstageGoldenPathGenerator:
             system_name = f"{base_name}-system"
             systems.add((system_name, base_name))
             
-            # Collect dependencies
+            # Collect dependencies using project_name as key to avoid overwriting
             deps = config.get('project', {}).get('dependencies', {})
             if deps:
-                all_dependencies[base_name] = (deps, system_name)
+                all_dependencies[project_name] = (deps, system_name)
             
             self._generate_project(project_name, config)
         

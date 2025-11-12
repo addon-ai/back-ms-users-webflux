@@ -49,6 +49,30 @@ spec:
 apiVersion: backstage.io/v1alpha1
 kind: Resource
 metadata:
+  name: springdoc-2-1-0
+  description: SpringDoc OpenAPI library version 2.1.0
+  tags:
+    - springdoc
+    - openapi
+spec:
+  type: library
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: h2-2-2-224
+  description: H2 Database Engine version 2.2.224
+  tags:
+    - h2
+    - database
+spec:
+  type: database-driver
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
   name: postgresql-42-7-3
   description: PostgreSQL JDBC Driver version 42.7.3
   tags:
@@ -114,6 +138,78 @@ metadata:
   tags:
     - flyway
     - database
+spec:
+  type: library
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: springwebflux-3-2-5
+  description: Spring WebFlux version 3.2.5
+  tags:
+    - spring-webflux
+    - reactive
+spec:
+  type: library
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: springdatar2dbc-3-2-5
+  description: Spring Data R2DBC version 3.2.5
+  tags:
+    - spring-data
+    - r2dbc
+spec:
+  type: library
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: r2dbcpostgresql-1-0-4-RELEASE
+  description: R2DBC PostgreSQL Driver version 1.0.4.RELEASE
+  tags:
+    - r2dbc
+    - postgresql
+spec:
+  type: database-driver
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: r2dbch2-1-0-0-RELEASE
+  description: R2DBC H2 Driver version 1.0.0.RELEASE
+  tags:
+    - r2dbc
+    - h2
+spec:
+  type: database-driver
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: springdocwebflux-2-1-0
+  description: SpringDoc OpenAPI WebFlux version 2.1.0
+  tags:
+    - springdoc
+    - webflux
+spec:
+  type: library
+  owner: platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: reactortest-3-6-5
+  description: Reactor Test version 3.6.5
+  tags:
+    - reactor
+    - testing
 spec:
   type: library
   owner: platform-team

@@ -120,11 +120,17 @@ spec:
         dep_mapping = {
             'java': ('Java Runtime Environment', 'runtime', ['java', 'runtime']),
             'springBoot': ('Spring Boot Framework', 'library', ['spring-boot', 'framework']),
+            'springWebflux': ('Spring WebFlux', 'library', ['spring-webflux', 'reactive']),
+            'springDataR2dbc': ('Spring Data R2DBC', 'library', ['spring-data', 'r2dbc']),
+            'r2dbcPostgresql': ('R2DBC PostgreSQL Driver', 'database-driver', ['r2dbc', 'postgresql']),
+            'r2dbcH2': ('R2DBC H2 Driver', 'database-driver', ['r2dbc', 'h2']),
             'mapstruct': ('MapStruct mapping library', 'library', ['mapstruct', 'mapping']),
             'lombok': ('Lombok code generation library', 'library', ['lombok', 'codegen']),
             'postgresql': ('PostgreSQL JDBC Driver', 'database-driver', ['postgresql', 'database']),
             'h2': ('H2 Database Engine', 'database-driver', ['h2', 'database']),
             'springdoc': ('SpringDoc OpenAPI library', 'library', ['springdoc', 'openapi']),
+            'springdocWebflux': ('SpringDoc OpenAPI WebFlux', 'library', ['springdoc', 'webflux']),
+            'reactorTest': ('Reactor Test', 'library', ['reactor', 'testing']),
             'mavenCompiler': ('Maven Compiler Plugin', 'library', ['maven', 'compiler']),
             'mavenSurefire': ('Maven Surefire Plugin', 'library', ['maven', 'testing']),
             'lombokMapstructBinding': ('Lombok MapStruct Binding', 'library', ['lombok', 'mapstruct']),
@@ -133,9 +139,9 @@ spec:
         }
         
         for base_name, (deps, system_name) in all_dependencies.items():
-            for key, (desc, res_type, tags) in dep_mapping.items():
-                if key in deps:
-                    version = deps[key]
+            for key, version in deps.items():
+                if key in dep_mapping:
+                    desc, res_type, tags = dep_mapping[key]
                     version_formatted = version.replace('.', '-').replace('Final', '').strip('-')
                     resource_name = f"{key.lower()}-{version_formatted}"
                     
